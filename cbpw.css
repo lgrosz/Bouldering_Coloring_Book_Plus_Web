@@ -1,0 +1,25 @@
+#route-viewer {
+    float: left;
+    clear: left;
+    width: 66%;
+    height: 66%;
+    background-color: silver;
+}
+
+#route-comments {
+    float: left;
+    clear: left;
+    width: 66%;
+    background-color: powderblue;
+}
+
+#route-details {
+    float: left;
+    background-color: moccasin;
+}
+
+#route-browser {
+    float: left;
+    background-color: mediumSeaGreen;
+}
+
