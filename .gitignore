@@ -1,2 +1,6 @@
 # Ignores for BCBPW project
 *.log
+
+#vim ignores
+*.swp
+*.vim
