@@ -1,5 +1,5 @@
 /* route-browser-button */
-button {
+.browser-button {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -12,4 +12,20 @@ button {
     cursor: pointer;
     width: 15%;
     white-space: nowrap;
+}
+
+/* browser div */
+#route-browser {
+}
+
+/* viewer div */
+#route-viewer {
+    width: 75%;
+    height: 75%;
+    overflow: auto;
+    border: 5px solid gray;
+}
+
+#route-canvas {
+    display: block;
 }
