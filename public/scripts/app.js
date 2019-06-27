@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', event => {
-
   // load firebase app
   try {
     const app = firebase.app();
@@ -8,11 +7,9 @@ document.addEventListener('DOMContentLoaded', event => {
     console.error(e)
     document.getElementById('load-firebase').innerHTML = 'Firebase load was unsuccessful, see console';
   }
-
   initRouteBrowser();
   initRouteViewer();
   drawRoute(null);
-
 });
 
 function initRouteBrowser() {
@@ -41,12 +38,10 @@ function initRouteBrowser() {
         var browser = document.getElementById('route-browser');
         button.onclick = function () {
           // reload browser
-          // draw route
           holdCollection = db.collection('routes').doc(doc.id).collection('holds');
           drawRoute(holdCollection);
         }
         browser.appendChild(button);
-        console.log(doc.id, ' => ', routeData);
       });
     })
     .catch(function(error) {
