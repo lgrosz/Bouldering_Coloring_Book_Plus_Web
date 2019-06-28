@@ -1,29 +1,21 @@
 /* route-browser-button */
 .browser-button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    width: 15%;
-    white-space: nowrap;
+  display: block;
 }
 
 /* browser div */
 #route-browser {
+  float:left;
+  overflow: auto;
 }
 
 /* viewer div */
 #route-viewer {
-    width: 75%;
-    height: 75%;
+    width: 75vw;
     overflow: auto;
     border: 5px solid gray;
+    float: left;
+    clear: left;
 }
 
 #route-canvas {

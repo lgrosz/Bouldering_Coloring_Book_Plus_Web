@@ -9,8 +9,11 @@ document.addEventListener('DOMContentLoaded', event => {
   }
   initRouteBrowser();
   initRouteViewer();
-  drawRoute(null);
 });
+
+function initRouteViewer() {
+  clearWall(false);
+}
 
 function initRouteBrowser() {
 
@@ -22,12 +25,9 @@ function initRouteBrowser() {
     .get()
     .then(function(querySnapshot) {
       querySnapshot.forEach(function(doc) {
-        // doc.data is never undefined for query snapshots
-        // doc a query document snapshot, and is "shallow"
         routeData = doc.data();
-        MAX_CHAR = 16
-        nameString = elipseTruncate(routeData.name, MAX_CHAR);
-        setterString = elipseTruncate(routeData.setter, MAX_CHAR);
+        nameString = routeData.name;
+        setterString = routeData.setter;
 
         //setup button
         var button = document.createElement('button');
@@ -48,14 +48,8 @@ function initRouteBrowser() {
     .catch(function(error) {
       console.log('Error getting documents: ', error);
     });
-
 }
 
-function initRouteViewer() {
-  clearWall(false);
-}
-
-// Setup canvas function
 function clearWall(clearWall=true) {
   canvas = document.getElementById('route-canvas');
   ctx = canvas.getContext('2d');
@@ -78,7 +72,6 @@ function clearWall(clearWall=true) {
   }
 }
 
-
 function drawRoute(holdCollection) {
   if (holdCollection != null) {
     holdCollection.get()
@@ -98,14 +91,27 @@ function drawHold(holdData, holdImage) {
     holdImage = new Image();
     holdImage.src = holdData.model;
     holdImage.onload = function() {
-      height = scale * holdImage.height;
-      width = scale * holdImage.width;
       x = scale * holdData.x;
       y = scale * holdData.y;
-      ctx.drawImage(holdImage, x, y, width, height);
+      s = holdData.scale;
+      r = holdData.r;
+      //move to center, rotate, and draw (at center)
+      drawImage(holdImage, x, y, s, r);
     }
   });
 }
+// no need to use save and restore between calls as it sets the transform rather 
+// than multiply it like ctx.rotate ctx.translate ctx.scale and ctx.transform
+// Also combining the scale and origin into the one call makes it quicker
+// x,y position of image center
+// scale scale of image
+// rotation in radians.
+// Thanks to Blindman67 on stackoverflow for this blazingly fast implementation
+function drawImage(image, x, y, scale, rotation){
+    ctx.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
+    ctx.rotate(rotation);
+    ctx.drawImage(image, -image.width / 2, -image.height / 2);
+}  
 
 function getViewerScale(callback) {
   const wallImage = new Image();
@@ -114,19 +120,4 @@ function getViewerScale(callback) {
     scale = 0.75 * window.innerHeight / wallImage.height;
     callback(scale);
   }
-}
-
-// fuction updateBrowser(currentRoute)
-// put current route on top, grayed out
-
-
-//
-// HELPER FUNCTIONS
-//
-
-function elipseTruncate(string, length) {
-  if (string.length > length) {
-    string = string.substr(0, length-3) + '...';
-  }
-  return string
 }
