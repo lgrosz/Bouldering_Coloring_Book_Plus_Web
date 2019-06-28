@@ -39,6 +39,7 @@ function initRouteBrowser() {
         button.onclick = function () {
           // reload browser
           holdCollection = db.collection('routes').doc(doc.id).collection('holds');
+          clearWall();
           drawRoute(holdCollection);
         }
         browser.appendChild(button);
@@ -50,11 +51,18 @@ function initRouteBrowser() {
 
 }
 
-// Setup canvas function
 function initRouteViewer() {
-  routeViewerDiv = document.getElementById('route-viewer');
+  clearWall(false);
+}
+
+// Setup canvas function
+function clearWall(clearWall=true) {
   canvas = document.getElementById('route-canvas');
   ctx = canvas.getContext('2d');
+
+  if (clearWall == true) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
 
   const wallImage = new Image();
   wallImage.src = '../assets/wall_images/all.png';
@@ -69,6 +77,7 @@ function initRouteViewer() {
     });
   }
 }
+
 
 function drawRoute(holdCollection) {
   if (holdCollection != null) {
