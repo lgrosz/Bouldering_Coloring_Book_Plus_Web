@@ -1,0 +1,11 @@
+#route-creator {
+    width: 100vw;
+    overflow: auto;
+    border: 5px solid gray;
+    float: left;
+    clear: left;
+}
+
+#route-canvas {
+    display: block;
+}
