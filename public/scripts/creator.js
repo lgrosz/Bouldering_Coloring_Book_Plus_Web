@@ -65,6 +65,7 @@ function WallState(canvas) {
     var l = holds.length;
     for (var i = l-1; i >= 0; i--) {
       if (holds[i].contains(mx, my)) {
+        console.log('here');
         var mySel = holds[i];
         // Keep track of where in the object we clicked
         // so we can move it smoothly (see mousemove)
@@ -96,7 +97,7 @@ function WallState(canvas) {
   // double click for adding holds
   canvas.addEventListener('dblclick', function(e) {
     var mouse = myState.getMouse(e);
-    myState.addHold(new Hold(mouse.x - 10, mouse.y - 10, 20, 20, 'rgba(0,255,0,.6)'));
+    myState.addHold(new Hold(mouse.x, mouse.y, 0, 1));
   }, true);
   
   // **** Options! ****
@@ -109,6 +110,9 @@ function WallState(canvas) {
 
 WallState.prototype.addHold = function(hold) {
   this.holds.push(hold);
+  //temp
+  holds = this.holds;
+  //
   this.valid = false;
 }
 
@@ -138,12 +142,12 @@ WallState.prototype.draw = function() {
     }
     
     // draw selection border
-    if (this.selection != null) {
-      ctx.strokeStyle = this.selectionColor;
-      ctx.lineWidth = this.selectionWidth;
-      var mySel = this.selection;
-      ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
-    }
+    //if (this.selection != null) {
+    //  ctx.strokeStyle = this.selectionColor;
+    //  ctx.lineWidth = this.selectionWidth;
+    //  var mySel = this.selection;
+    //  ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
+    //}
     
     // foreground
     
@@ -174,25 +178,39 @@ WallState.prototype.getMouse = function(e) {
   return {x: mx, y: my};
 }
 
-function Hold(x, y, w, h, fill) {
-  // This is a very simple and unsafe constructor. All we're doing is checking if the values exist.
-  // "x || 0" just means "if there is a value for x, use that. Otherwise use 0."
-  // But we aren't checking anything else! We could put "Lalala" for the value of x 
-  this.x = x || 0;
-  this.y = y || 0;
-  this.w = w || 1;
-  this.h = h || 1;
-  this.fill = fill || '#AAAAAA';
+function Hold(x, y, r, s) {
+  // TODO creator position, not aboslute position, saving this will lose
+  //      data!!!! (but is it significant)
+  this.x = x; // x position
+  this.y = y; // y position
+  this.r = r; // rotation
+  this.s = s; // scale
+  this.model = '../assets/holds/sample-hold.png'
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx) {
-  ctx.fillStyle = this.fill;
-  ctx.fillRect(this.x, this.y, this.w, this.h);
+  //can do something like {x,y,r,s} = this
+  var x = this.x;
+  var y = this.y;
+  var r = this.r;
+  var s = this.s;
+  const holdImage = new Image();
+  holdImage.src = '../assets/holds/sample-hold.png'
+  holdImage.onload = function() {
+    var width = s * holdImage.width;
+    var height = s * holdImage.height;
+    x = x - width/2;
+    y = y - height/2;
+    ctx.drawImage(holdImage, x, y, width, height); 
+  }
 }
 
 // Determine if a point is inside the shape's bounds
+// TODO THIS!
 Hold.prototype.contains = function(mx, my) {
+  var hold = this;
+  console.log(hold);
   return  (this.x <= mx) && (this.x + this.w >= mx) &&
           (this.y <= my) && (this.y + this.h >= my);
 }
