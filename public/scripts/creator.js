@@ -25,7 +25,7 @@ function WallState(canvas) {
 
   // This complicates things a little but but fixes mouse co-ordinate problems
   // when there's a border or padding. See getMouse for more detail
-  var stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
+  let stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
   if (document.defaultView && document.defaultView.getComputedStyle) {
     this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10)      || 0;
     this.stylePaddingTop  = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingTop'], 10)       || 0;
@@ -34,7 +34,7 @@ function WallState(canvas) {
   }
   // Some pages have fixed-position bars (like the stumbleupon bar) at the top or left of the page
   // They will mess up mouse coordinates and this fixes that
-  var html = document.body.parentNode;
+  let html = document.body.parentNode;
   this.htmlTop = html.offsetTop;
   this.htmlLeft = html.offsetLeft;
 
@@ -56,17 +56,16 @@ function WallState(canvas) {
     return false;
   }, false);
 
-  // for setting state variables for mouse down
+  // for setting state letiables for mouse down
   canvas.addEventListener('mousedown', function(e) {
-    var mouse = myState.getMouse(e);
-    var mx = mouse.x;
-    var my = mouse.y;
-    var holds = myState.holds;
-    var l = holds.length;
-    for (var i = l-1; i >= 0; i--) {
+    let mouse = myState.getMouse(e);
+    let mx = mouse.x;
+    let my = mouse.y;
+    let holds = myState.holds;
+    let l = holds.length;
+    for (let i = l-1; i >= 0; i--) {
       if (holds[i].contains(mx, my)) {
-        console.log('here');
-        var mySel = holds[i];
+        let mySel = holds[i];
         // Keep track of where in the object we clicked
         // so we can move it smoothly (see mousemove)
         myState.dragoffx = mx - mySel.x;
@@ -79,10 +78,10 @@ function WallState(canvas) {
     }
   });
 
-  // for setting state variables for mouse moving
+  // for setting state letiables for mouse moving
   canvas.addEventListener('mousemove', function(e) {
     if (myState.dragging) {
-      var mouse = myState.getMouse(e);
+      let mouse = myState.getMouse(e);
       myState.selection.x = mouse.x - myState.dragoffx;
       myState.selection.y = mouse.y - myState.dragoffy;   
       myState.valid = false;
@@ -96,7 +95,7 @@ function WallState(canvas) {
 
   // double click for adding holds
   canvas.addEventListener('dblclick', function(e) {
-    var mouse = myState.getMouse(e);
+    let mouse = myState.getMouse(e);
     myState.addHold(new Hold(mouse.x, mouse.y, 0, 1));
   }, true);
   
@@ -110,9 +109,6 @@ function WallState(canvas) {
 
 WallState.prototype.addHold = function(hold) {
   this.holds.push(hold);
-  //temp
-  holds = this.holds;
-  //
   this.valid = false;
 }
 
@@ -123,8 +119,8 @@ WallState.prototype.clear = function() {
 WallState.prototype.draw = function() {
   // if our state is invalid, redraw
   if (!this.valid) {
-    var ctx = this.ctx;
-    var holds = this.holds;
+    let ctx = this.ctx;
+    let holds = this.holds;
     this.clear();
     
     // background
@@ -135,9 +131,9 @@ WallState.prototype.draw = function() {
     }
     
     // draw all holds
-    var l = holds.length;
-    for (var i = 0; i < l; i++) {
-      var hold = holds[i];
+    let l = holds.length;
+    for (let i = 0; i < l; i++) {
+      let hold = holds[i];
       holds[i].draw(ctx);
     }
     
@@ -145,7 +141,7 @@ WallState.prototype.draw = function() {
     //if (this.selection != null) {
     //  ctx.strokeStyle = this.selectionColor;
     //  ctx.lineWidth = this.selectionWidth;
-    //  var mySel = this.selection;
+    //  let mySel = this.selection;
     //  ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
     //}
     
@@ -156,61 +152,51 @@ WallState.prototype.draw = function() {
 }
 
 WallState.prototype.getMouse = function(e) {
-  var element = this.canvas, offsetX = 0, offsetY = 0, mx, my;
-  
-  // Compute the total offset
-  if (element.offsetParent !== undefined) {
-    do {
-      offsetX += element.offsetLeft;
-      offsetY += element.offsetTop;
-    } while ((element = element.offsetParent));
-  }
-
-  // Add padding and border style widths to offset
-  // Also add the <html> offsets in case there's a position:fixed bar
-  offsetX += this.stylePaddingLeft + this.styleBorderLeft + this.htmlLeft;
-  offsetY += this.stylePaddingTop + this.styleBorderTop + this.htmlTop;
-
-  mx = e.pageX - offsetX;
-  my = e.pageY - offsetY;
-  
-  // We return a simple javascript object (a hash) with x and y defined
-  return {x: mx, y: my};
+    let rect = this.canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
 }
 
 function Hold(x, y, r, s) {
   // TODO creator position, not aboslute position, saving this will lose
   //      data!!!! (but is it significant)
-  this.x = x; // x position
-  this.y = y; // y position
-  this.r = r; // rotation
-  this.s = s; // scale
   this.model = '../assets/holds/sample-hold.png'
+  hold = this;
+  // let's get the dimensions once
+  const holdImage = new Image();
+  holdImage.src = this.model;
+  holdImage.onload = function() {
+    hold.s = s; // scale
+    hold.r = r; // rotation
+    hold.w = hold.s * holdImage.width
+    hold.h = hold.s * holdImage.height
+    hold.x = x - hold.w / 2; // x position
+    hold.y = y - hold.h / 2; // y position
+  }
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx) {
   //can do something like {x,y,r,s} = this
-  var x = this.x;
-  var y = this.y;
-  var r = this.r;
-  var s = this.s;
+  let x = this.x;
+  let y = this.y;
+  let r = this.r;
+  let w = this.w;
+  let h = this.h;
+  let s = this.s;
   const holdImage = new Image();
   holdImage.src = '../assets/holds/sample-hold.png'
   holdImage.onload = function() {
-    var width = s * holdImage.width;
-    var height = s * holdImage.height;
-    x = x - width/2;
-    y = y - height/2;
-    ctx.drawImage(holdImage, x, y, width, height); 
+    ctx.drawImage(holdImage, x, y, w, h); 
   }
 }
 
 // Determine if a point is inside the shape's bounds
 // TODO THIS!
 Hold.prototype.contains = function(mx, my) {
-  var hold = this;
-  console.log(hold);
+  let hold = this;
   return  (this.x <= mx) && (this.x + this.w >= mx) &&
           (this.y <= my) && (this.y + this.h >= my);
 }
