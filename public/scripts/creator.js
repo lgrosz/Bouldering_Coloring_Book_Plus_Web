@@ -23,6 +23,10 @@ function WallState(canvas) {
   this.scale = this.height / window.innerHeight;
   this.ctx = canvas.getContext('2d');
 
+  // image storage
+  // {"path": image}
+  this.images = new Object();
+
   // This complicates things a little but but fixes mouse co-ordinate problems
   // when there's a border or padding. See getMouse for more detail
   let stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
@@ -124,10 +128,17 @@ WallState.prototype.draw = function() {
     this.clear();
     
     // background
-    const wallImage = new Image();
-    wallImage.src = '../assets/wall_images/all.png';
-    wallImage.onload = function() {
-      ctx.drawImage(wallImage, 0, 0, myState.width, myState.height);
+    if ('../assets/wall_images/all.png' in myState.images) {
+      image = myState.images['../assets/wall_images/all.png'];
+      ctx.drawImage(image, 0, 0, myState.width, myState.height);
+    }
+    else {
+      const wallImage = new Image();
+      wallImage.src = '../assets/wall_images/all.png';
+      wallImage.onload = function() {
+        ctx.drawImage(wallImage, 0, 0, myState.width, myState.height);
+      myState.images['../assets/wall_images/all.png'] = wallImage;
+      }
     }
     
     // draw all holds
@@ -163,38 +174,48 @@ function Hold(x, y, r, s) {
   // TODO creator position, not aboslute position, saving this will lose
   //      data!!!! (but is it significant)
   this.model = '../assets/holds/sample-hold.png'
-  hold = this;
+  this.images = new Object();
+
+  //closure
+  myHold = this;
+
   // let's get the dimensions once
   const holdImage = new Image();
   holdImage.src = this.model;
   holdImage.onload = function() {
-    hold.s = s; // scale
-    hold.r = r; // rotation
-    hold.w = hold.s * holdImage.width
-    hold.h = hold.s * holdImage.height
-    hold.x = x - hold.w / 2; // x position
-    hold.y = y - hold.h / 2; // y position
+    myHold.s = s; // scale
+    myHold.r = r; // rotation
+    myHold.w = myHold.s * holdImage.width
+    myHold.h = myHold.s * holdImage.height
+    //store the position of the corner
+    //TODO should we store the corner position or
+    //the center and draw differently? Probably store the center position
+    //because that's how the viewer works.
+    myHold.x = x - myHold.w / 2; // x position
+    myHold.y = y - myHold.h / 2; // y position
+    myHold.images[myHold.model] = holdImage;
   }
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx) {
   //can do something like {x,y,r,s} = this
-  let x = this.x;
-  let y = this.y;
-  let r = this.r;
-  let w = this.w;
-  let h = this.h;
-  let s = this.s;
-  const holdImage = new Image();
-  holdImage.src = '../assets/holds/sample-hold.png'
-  holdImage.onload = function() {
-    ctx.drawImage(holdImage, x, y, w, h); 
+  let {x, y, r, w, h, s} = this;
+  if (this.model in this.images) {
+    image = this.images[this.model];
+    ctx.drawImage(image, x ,y, w, h);
+  }
+  else {
+    const holdImage = new Image();
+    holdImage.src = '../assets/holds/sample-hold.png'
+    holdImage.onload = function() {
+      ctx.drawImage(holdImage, x, y, w, h); 
+      this.images[this.model] = holdImage;
+    }
   }
 }
 
 // Determine if a point is inside the shape's bounds
-// TODO THIS!
 Hold.prototype.contains = function(mx, my) {
   let hold = this;
   return  (this.x <= mx) && (this.x + this.w >= mx) &&
