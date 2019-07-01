@@ -27,21 +27,6 @@ function WallState(canvas) {
   // {"path": image}
   this.images = new Object();
 
-  // This complicates things a little but but fixes mouse co-ordinate problems
-  // when there's a border or padding. See getMouse for more detail
-  let stylePaddingLeft, stylePaddingTop, styleBorderLeft, styleBorderTop;
-  if (document.defaultView && document.defaultView.getComputedStyle) {
-    this.stylePaddingLeft = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingLeft'], 10)      || 0;
-    this.stylePaddingTop  = parseInt(document.defaultView.getComputedStyle(canvas, null)['paddingTop'], 10)       || 0;
-    this.styleBorderLeft  = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderLeftWidth'], 10)  || 0;
-    this.styleBorderTop   = parseInt(document.defaultView.getComputedStyle(canvas, null)['borderTopWidth'], 10)   || 0;
-  }
-  // Some pages have fixed-position bars (like the stumbleupon bar) at the top or left of the page
-  // They will mess up mouse coordinates and this fixes that
-  let html = document.body.parentNode;
-  this.htmlTop = html.offsetTop;
-  this.htmlLeft = html.offsetLeft;
-
   // keep track of the state of the canvas
   this.valid = false; //if false, canvas needs to redraw
   this.holds = []; // keeps hold data
@@ -70,19 +55,18 @@ function WallState(canvas) {
     for (let i = l-1; i >= 0; i--) {
       if (holds[i].contains(mx, my)) {
         let mySel = holds[i];
-        // Keep track of where in the object we clicked
-        // so we can move it smoothly (see mousemove)
         myState.dragoffx = mx - mySel.x;
         myState.dragoffy = my - mySel.y;
-        myState.dragging = true;
         myState.selection = mySel;
+        myState.dragging = true;
         myState.valid = false;
         return;
       }
+      myState.selection = null;
     }
   });
 
-  // for setting state letiables for mouse moving
+  // for setting state variables for mouse moving
   canvas.addEventListener('mousemove', function(e) {
     if (myState.dragging) {
       let mouse = myState.getMouse(e);
@@ -102,6 +86,22 @@ function WallState(canvas) {
     let mouse = myState.getMouse(e);
     myState.addHold(new Hold(mouse.x, mouse.y, 0, 1));
   }, true);
+
+  //event listeners for keypresses
+  canvas.addEventListener('keydown', e => {
+    if (e.code == 'KeyD') {
+      if (myState.selection != null) {
+        let holds = myState.holds;
+        let l = holds.length;
+        for (let i = l-1; i >= 0; i--) {
+          myState.holds.splice(i, 1);
+          myState.selection = null;
+          myState.valid = false;
+          return;
+        }
+      }
+    }
+  });
   
   // **** Options! ****
   
@@ -179,20 +179,18 @@ function Hold(x, y, r, s) {
   //closure
   myHold = this;
 
-  // let's get the dimensions once
+  // positional info
+  myHold.x = x; // x pos
+  myHold.y = y; // y pos
+  myHold.s = s; // scale
+  myHold.r = r; // rotation
+
+  // the width and height depend on the image
   const holdImage = new Image();
   holdImage.src = this.model;
   holdImage.onload = function() {
-    myHold.s = s; // scale
-    myHold.r = r; // rotation
     myHold.w = myHold.s * holdImage.width
     myHold.h = myHold.s * holdImage.height
-    //store the position of the corner
-    //TODO should we store the corner position or
-    //the center and draw differently? Probably store the center position
-    //because that's how the viewer works.
-    myHold.x = x - myHold.w / 2; // x position
-    myHold.y = y - myHold.h / 2; // y position
     myHold.images[myHold.model] = holdImage;
   }
 }
@@ -203,21 +201,21 @@ Hold.prototype.draw = function(ctx) {
   let {x, y, r, w, h, s} = this;
   if (this.model in this.images) {
     image = this.images[this.model];
-    ctx.drawImage(image, x ,y, w, h);
+    ctx.drawImage(image, x-w/2 ,y-h/2, w, h);
   }
   else {
-    const holdImage = new Image();
-    holdImage.src = '../assets/holds/sample-hold.png'
-    holdImage.onload = function() {
-      ctx.drawImage(holdImage, x, y, w, h); 
-      this.images[this.model] = holdImage;
-    }
+    //const holdImage = new Image();
+    //holdImage.src = '../assets/holds/sample-hold.png'
+    //holdImage.onload = function() {
+    //  ctx.drawImage(holdImage, x-w/2 ,y-h/2, w, h);
+    //  this.images[this.model] = holdImage;
+    console.log('Image wasn\'t ready to be drawn');
   }
 }
 
 // Determine if a point is inside the shape's bounds
 Hold.prototype.contains = function(mx, my) {
-  let hold = this;
-  return  (this.x <= mx) && (this.x + this.w >= mx) &&
-          (this.y <= my) && (this.y + this.h >= my);
+  inXBounds = (mx > this.x - this.w/2) && (mx < this.x + this.w/2)
+  inYBounds = (my > this.y - this.h/2) && (my < this.y + this.h/2)
+  return (inXBounds && inYBounds);
 }
