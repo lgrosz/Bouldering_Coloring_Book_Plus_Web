@@ -63,6 +63,7 @@ function WallState(canvas) {
         return;
       }
       myState.selection = null;
+      myState.valid = false;
     }
   });
 
@@ -103,10 +104,7 @@ function WallState(canvas) {
     }
   });
   
-  // **** Options! ****
-  
-  this.selectionColor = '#CC0000';
-  this.selectionWidth = 2;  
+  // refreshing
   this.interval = 30;
   setInterval(function() { myState.draw(); }, myState.interval);
 }
@@ -149,12 +147,12 @@ WallState.prototype.draw = function() {
     }
     
     // draw selection border
-    //if (this.selection != null) {
-    //  ctx.strokeStyle = this.selectionColor;
-    //  ctx.lineWidth = this.selectionWidth;
-    //  let mySel = this.selection;
-    //  ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
-    //}
+    if (this.selection != null) {
+      ctx.strokeStyle = this.selectionColor;
+      ctx.lineWidth = this.selectionWidth;
+      let mySel = this.selection;
+      ctx.strokeRect(mySel.x-mySel.w/2,mySel.y-mySel.h/2,mySel.w,mySel.h);
+    }
     
     // foreground
     
