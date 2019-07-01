@@ -85,7 +85,7 @@ function WallState(canvas) {
   // double click for adding holds
   canvas.addEventListener('dblclick', function(e) {
     let mouse = myState.getMouse(e);
-    myState.addHold(new Hold(mouse.x, mouse.y, 45, 1));
+    myState.addHold(new Hold(mouse.x, mouse.y, 0, 1));
   }, true);
 
   //event listeners for keypresses
@@ -94,12 +94,20 @@ function WallState(canvas) {
       if (myState.selection != null) {
         let holds = myState.holds;
         let l = holds.length;
-        for (let i = l-1; i >= 0; i--) {
-          myState.holds.splice(i, 1);
-          myState.selection = null;
-          myState.valid = false;
-          return;
+        for (let i = 0; i < l; i++) {
+          if (holds[i] == myState.selection) {
+            myState.holds.splice(i, 1);
+            myState.selection = null;
+            myState.valid = false;
+            return;
+          }
         }
+      }
+    }
+    if (e.code == 'KeyR') {
+      if (myState.selection != null) {
+        myState.selection.r += 15;
+        myState.valid = false;
       }
     }
   });
@@ -147,17 +155,16 @@ WallState.prototype.draw = function() {
     }
     
     // draw selection border
+    // this is kind of just a visual thing right now...
+    // the actual selecting has nothing to do with this stroke
     if (this.selection != null) {
-      let mySel = this.selection;
-      // visual widths and height depend on the rotation
-      // TODO but not like this...
-      // vis_w = mySel.w * Math.cos(mySel.r * Math.PI / 180)
-      // vis_h = mySel.h * Math.sin(mySel.r * Math.PI / 180)
-      // ctx.strokeRect(mySel.x-vis_w/2,mySel.y-vis_h/2,vis_w,vis_h);
-      ctx.strokeRect(mySel.x-mySel.w/2, mySel.y-mySel.h/2, mySel.w, mySel.h);
+      let {x, y, w, h, r} = this.selection;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(r * Math.PI / 180);
+      ctx.strokeRect(-w/2, -h/2, w, h);
+      ctx.restore();
     }
-    
-    // foreground
     
     this.valid = true;
   }
@@ -205,16 +212,10 @@ Hold.prototype.draw = function(ctx) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(r * Math.PI / 180);
-    //ctx.drawImage(image, x-w/2 ,y-h/2, w, h);
     ctx.drawImage(image, -w/2, -h/2, w, h);
     ctx.restore();
   }
   else {
-    //const holdImage = new Image();
-    //holdImage.src = '../assets/holds/sample-hold.png'
-    //holdImage.onload = function() {
-    //  ctx.drawImage(holdImage, x-w/2 ,y-h/2, w, h);
-    //  this.images[this.model] = holdImage;
     console.log('Image wasn\'t ready to be drawn');
     wall.valid = false;
   }
