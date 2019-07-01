@@ -35,8 +35,8 @@ function WallState(canvas) {
   this.dragoffx = 0; // drag offsets
   this.dragoffy = 0;
 
-  // `this` will mean the canvas, not WallState. But we will use WallState
-  // for redrawing things, so here is a reference to the WallState object.
+  // in event listeners, `this` means the canvas, so we'll need some other
+  // variable to access the WallState object.
   myState = this;
 
   // remove text selection double click behavior
@@ -85,7 +85,7 @@ function WallState(canvas) {
   // double click for adding holds
   canvas.addEventListener('dblclick', function(e) {
     let mouse = myState.getMouse(e);
-    myState.addHold(new Hold(mouse.x, mouse.y, 0, 1));
+    myState.addHold(new Hold(mouse.x, mouse.y, 45, 1));
   }, true);
 
   //event listeners for keypresses
@@ -148,10 +148,13 @@ WallState.prototype.draw = function() {
     
     // draw selection border
     if (this.selection != null) {
-      ctx.strokeStyle = this.selectionColor;
-      ctx.lineWidth = this.selectionWidth;
       let mySel = this.selection;
-      ctx.strokeRect(mySel.x-mySel.w/2,mySel.y-mySel.h/2,mySel.w,mySel.h);
+      // visual widths and height depend on the rotation
+      // TODO but not like this...
+      // vis_w = mySel.w * Math.cos(mySel.r * Math.PI / 180)
+      // vis_h = mySel.h * Math.sin(mySel.r * Math.PI / 180)
+      // ctx.strokeRect(mySel.x-vis_w/2,mySel.y-vis_h/2,vis_w,vis_h);
+      ctx.strokeRect(mySel.x-mySel.w/2, mySel.y-mySel.h/2, mySel.w, mySel.h);
     }
     
     // foreground
@@ -199,7 +202,12 @@ Hold.prototype.draw = function(ctx) {
   let {x, y, r, w, h, s} = this;
   if (this.model in this.images) {
     image = this.images[this.model];
-    ctx.drawImage(image, x-w/2 ,y-h/2, w, h);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(r * Math.PI / 180);
+    //ctx.drawImage(image, x-w/2 ,y-h/2, w, h);
+    ctx.drawImage(image, -w/2, -h/2, w, h);
+    ctx.restore();
   }
   else {
     //const holdImage = new Image();
@@ -208,11 +216,13 @@ Hold.prototype.draw = function(ctx) {
     //  ctx.drawImage(holdImage, x-w/2 ,y-h/2, w, h);
     //  this.images[this.model] = holdImage;
     console.log('Image wasn\'t ready to be drawn');
+    wall.valid = false;
   }
 }
 
 // Determine if a point is inside the shape's bounds
 Hold.prototype.contains = function(mx, my) {
+  // TODO this should change based on rotation of the hold
   inXBounds = (mx > this.x - this.w/2) && (mx < this.x + this.w/2)
   inYBounds = (my > this.y - this.h/2) && (my < this.y + this.h/2)
   return (inXBounds && inYBounds);
