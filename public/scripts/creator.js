@@ -17,10 +17,10 @@ function init() {
 
 function WallState(canvas) {
   // setup canvas dimensions
+  this.div = document.getElementById('route-creator');
   this.canvas = canvas;
-  this.width = canvas.width;
-  this.height = canvas.height;
-  this.scale = this.height / window.innerHeight;
+  //we will find this out once we draw, or we can hardcode it...
+  this.scale = null; 
   this.ctx = canvas.getContext('2d');
 
   // image storage
@@ -227,7 +227,14 @@ WallState.prototype.draw = function() {
       const wallImage = new Image();
       wallImage.src = '../assets/wall_images/all.png';
       wallImage.onload = function() {
-        ctx.drawImage(wallImage, 0, 0, myState.width, myState.height);
+        myState.canvas.height = myState.div.clientHeight;
+        newHeight = myState.canvas.clientHeight;
+        myState.scale = newHeight / wallImage.height;
+        newWidth = myState.scale * wallImage.width;
+        myState.canvas.width = newWidth;
+        myState.width = newWidth;
+        myState.height = newHeight;
+        ctx.drawImage(wallImage, 0, 0, newWidth, newHeight);
       myState.images['../assets/wall_images/all.png'] = wallImage;
       }
     }
