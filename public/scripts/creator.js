@@ -90,25 +90,45 @@ function WallState(canvas) {
 
   //event listeners for keypresses
   canvas.addEventListener('keydown', e => {
-    if (e.code == 'KeyD') {
-      if (myState.selection != null) {
-        let holds = myState.holds;
-        let l = holds.length;
-        for (let i = 0; i < l; i++) {
-          if (holds[i] == myState.selection) {
-            myState.holds.splice(i, 1);
-            myState.selection = null;
-            myState.valid = false;
-            return;
-          }
-        }
+    if (myState.selection != null) {
+      switch(e.code) {
+        case 'KeyK':
+          this.deleteHold();
+          break;
+        case 'KeyW':
+          this.moveUpHold();
+          break;
+        case 'KeyA':
+          this.moveLeftHold();
+          break;
+        case 'KeyS':
+          this.moveDownHold();
+          break;
+        case 'KeyD':
+          this.moveRightHold();
+          break;
+        case 'KeyQ':
+          this.rotateLeftHold();
+          break;
+        case 'KeyE':
+          this.rotateRightHold();
+          break;
+        case 'KeyZ':
+          this.scaleHold(e);
+          break;
+        case 'KeyX':
+          this.xScaleHold(e);
+          break;
+        case 'KeyC':
+          this.yScaleHold(e);
+          break;
+        case 'KeyR':
+          this.resetHold();
+          break;
+        default:
+          break;
       }
-    }
-    if (e.code == 'KeyR') {
-      if (myState.selection != null) {
-        myState.selection.r += 15;
-        myState.valid = false;
-      }
+      myState.valid = false;
     }
   });
   
@@ -124,6 +144,71 @@ WallState.prototype.addHold = function(hold) {
 
 WallState.prototype.clear = function() {
   this.ctx.clearRect(0, 0, this.width, this.height);
+}
+
+WallState.prototype.deleteHold = function() {
+  let holds = myState.holds;
+  let l = holds.length;
+  for (let i = 0; i < l; i++) {
+    if (holds[i] == myState.selection) {
+      myState.holds.splice(i, 1);
+      myState.selection = null;
+      return;
+    }
+  }
+}
+
+WallState.prototype.moveUpHold = function() {
+  myState.selection.y -= 10;
+  return;
+}
+
+WallState.prototype.moveDownHold = function() {
+  myState.selection.y += 10;
+  return;
+}
+
+WallState.prototype.moveLeftHold = function() {
+  myState.selection.x -= 10;
+  return;
+}
+
+WallState.prototype.moveRightHold = function() {
+  myState.selection.x += 10;
+  return;
+}
+
+WallState.prototype.rotateLeftHold = function() {
+  myState.selection.r -= 15;
+  return;
+}
+
+WallState.prototype.rotateRightHold = function() {
+  myState.selection.r += 15;
+  return;
+}
+
+WallState.prototype.scaleHold = function(e) {
+  myState.xScaleHold(e);
+  myState.yScaleHold(e);
+  return;
+}
+
+WallState.prototype.xScaleHold = function(e) {
+  myState.selection.xs += e.getModifierState('Control') ? -0.1 : 0.1;
+  return;
+}
+
+WallState.prototype.yScaleHold = function(e) {
+  myState.selection.ys += e.getModifierState('Control') ? -0.1 : 0.1;
+  return;
+}
+
+WallState.prototype.resetHold = function() {
+  myState.selection.xs = 1;
+  myState.selection.ys = 1;
+  myState.selection.r = 1;
+  return;
 }
 
 WallState.prototype.draw = function() {
@@ -158,11 +243,11 @@ WallState.prototype.draw = function() {
     // this is kind of just a visual thing right now...
     // the actual selecting has nothing to do with this stroke
     if (this.selection != null) {
-      let {x, y, w, h, r} = this.selection;
+      let {x, y, w, h, r, xs, ys} = this.selection;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(r * Math.PI / 180);
-      ctx.strokeRect(-w/2, -h/2, w, h);
+      ctx.strokeRect(-w/2*xs, -h/2*ys, w*xs, h*ys);
       ctx.restore();
     }
     
@@ -190,15 +275,16 @@ function Hold(x, y, r, s) {
   // positional info
   myHold.x = x; // x pos
   myHold.y = y; // y pos
-  myHold.s = s; // scale
+  myHold.xs = s; // scale
+  myHold.ys = s; // scale
   myHold.r = r; // rotation
 
   // the width and height depend on the image
   const holdImage = new Image();
   holdImage.src = this.model;
   holdImage.onload = function() {
-    myHold.w = myHold.s * holdImage.width
-    myHold.h = myHold.s * holdImage.height
+    myHold.w = myHold.xs * holdImage.width
+    myHold.h = myHold.ys * holdImage.height
     myHold.images[myHold.model] = holdImage;
   }
 }
@@ -206,13 +292,13 @@ function Hold(x, y, r, s) {
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx) {
   //can do something like {x,y,r,s} = this
-  let {x, y, r, w, h, s} = this;
+  let {x, y, r, w, h, xs, ys} = this;
   if (this.model in this.images) {
     image = this.images[this.model];
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(r * Math.PI / 180);
-    ctx.drawImage(image, -w/2, -h/2, w, h);
+    ctx.drawImage(image, -w/2*xs, -h/2*ys, w*xs, h*ys);
     ctx.restore();
   }
   else {
