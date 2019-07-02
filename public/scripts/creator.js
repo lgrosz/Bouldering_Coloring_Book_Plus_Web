@@ -53,7 +53,7 @@ function WallState(canvas) {
     let holds = myState.holds;
     let l = holds.length;
     for (let i = l-1; i >= 0; i--) {
-      if (holds[i].contains(mx, my)) {
+      if (holds[i].contains(mx, my, myState.scale)) {
         let mySel = holds[i];
         myState.dragoffx = mx - mySel.x;
         myState.dragoffy = my - mySel.y;
@@ -243,7 +243,7 @@ WallState.prototype.draw = function() {
     let l = holds.length;
     for (let i = 0; i < l; i++) {
       let hold = holds[i];
-      holds[i].draw(ctx);
+      holds[i].draw(ctx, myState.scale);
     }
     
     // draw selection border
@@ -251,10 +251,11 @@ WallState.prototype.draw = function() {
     // the actual selecting has nothing to do with this stroke
     if (this.selection != null) {
       let {x, y, w, h, r, xs, ys} = this.selection;
+      let scale = this.scale;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(r * Math.PI / 180);
-      ctx.strokeRect(-w/2*xs, -h/2*ys, w*xs, h*ys);
+      ctx.strokeRect(-w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
       ctx.restore();
     }
     
@@ -297,7 +298,7 @@ function Hold(x, y, r, s) {
 }
 
 // Draws this shape to a given context
-Hold.prototype.draw = function(ctx) {
+Hold.prototype.draw = function(ctx, scale) {
   //can do something like {x,y,r,s} = this
   let {x, y, r, w, h, xs, ys} = this;
   if (this.model in this.images) {
@@ -305,7 +306,7 @@ Hold.prototype.draw = function(ctx) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(r * Math.PI / 180);
-    ctx.drawImage(image, -w/2*xs, -h/2*ys, w*xs, h*ys);
+    ctx.drawImage(image, -w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
     ctx.restore();
   }
   else {
@@ -315,9 +316,9 @@ Hold.prototype.draw = function(ctx) {
 }
 
 // Determine if a point is inside the shape's bounds
-Hold.prototype.contains = function(mx, my) {
+Hold.prototype.contains = function(mx, my, scale) {
   // TODO this should change based on rotation of the hold
-  inXBounds = (mx > this.x - this.w/2) && (mx < this.x + this.w/2)
-  inYBounds = (my > this.y - this.h/2) && (my < this.y + this.h/2)
+  inXBounds = (mx > this.x - this.w/2*scale) && (mx < this.x + this.w/2*scale)
+  inYBounds = (my > this.y - this.h/2*scale) && (my < this.y + this.h/2*scale)
   return (inXBounds && inYBounds);
 }

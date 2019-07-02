@@ -1,16 +1,17 @@
 #route-creator {
-    height: 90%;
-    max-height: 3325px;
-    max-width: 1069px;
-    overflow: auto;
-    border: 5px solid gray;
+  height: 90%;
+  /* These are the dimensions of the wall image*/
+  max-height: 3325px;
+  max-width: 1069px;
+  overflow: auto;
+  border: 5px solid gray;
 }
 
 #route-canvas {
-  /* These are the dimensions of the wall image*/
   display: block;
 }
 
 html, body {
-  height:100%;
+  height: 100vh;
+  width: 100vw;
 }
