@@ -1,5 +1,9 @@
 #route-creator {
+  /*make the div centralized*/
+  margin:0 auto;
   height: 90%;
+  /*not sure why this has to be min but okay*/
+  min-width: 90%;
   /* These are the dimensions of the wall image*/
   max-height: 3325px;
   max-width: 1069px;

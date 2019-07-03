@@ -12,10 +12,10 @@ document.addEventListener('DOMContentLoaded', event => {
 
 
 function init() {
-  wall = new WallState(document.getElementById('route-canvas'));
+  wall = new CreatorState(document.getElementById('route-canvas'));
 }
 
-function WallState(canvas) {
+function CreatorState(canvas) {
   // setup canvas dimensions
   this.div = document.getElementById('route-creator');
   this.canvas = canvas;
@@ -36,7 +36,7 @@ function WallState(canvas) {
   this.dragoffy = 0;
 
   // in event listeners, `this` means the canvas, so we'll need some other
-  // variable to access the WallState object.
+  // variable to access the CreatorState object.
   myState = this;
 
   // remove text selection double click behavior
@@ -137,16 +137,16 @@ function WallState(canvas) {
   setInterval(function() { myState.draw(); }, myState.interval);
 }
 
-WallState.prototype.addHold = function(hold) {
+CreatorState.prototype.addHold = function(hold) {
   this.holds.push(hold);
   this.valid = false;
 }
 
-WallState.prototype.clear = function() {
+CreatorState.prototype.clear = function() {
   this.ctx.clearRect(0, 0, this.width, this.height);
 }
 
-WallState.prototype.deleteHold = function() {
+CreatorState.prototype.deleteHold = function() {
   let holds = myState.holds;
   let l = holds.length;
   for (let i = 0; i < l; i++) {
@@ -158,60 +158,60 @@ WallState.prototype.deleteHold = function() {
   }
 }
 
-WallState.prototype.moveUpHold = function() {
+CreatorState.prototype.moveUpHold = function() {
   myState.selection.y -= 10;
   return;
 }
 
-WallState.prototype.moveDownHold = function() {
+CreatorState.prototype.moveDownHold = function() {
   myState.selection.y += 10;
   return;
 }
 
-WallState.prototype.moveLeftHold = function() {
+CreatorState.prototype.moveLeftHold = function() {
   myState.selection.x -= 10;
   return;
 }
 
-WallState.prototype.moveRightHold = function() {
+CreatorState.prototype.moveRightHold = function() {
   myState.selection.x += 10;
   return;
 }
 
-WallState.prototype.rotateLeftHold = function() {
+CreatorState.prototype.rotateLeftHold = function() {
   myState.selection.r -= 15;
   return;
 }
 
-WallState.prototype.rotateRightHold = function() {
+CreatorState.prototype.rotateRightHold = function() {
   myState.selection.r += 15;
   return;
 }
 
-WallState.prototype.scaleHold = function(e) {
+CreatorState.prototype.scaleHold = function(e) {
   myState.xScaleHold(e);
   myState.yScaleHold(e);
   return;
 }
 
-WallState.prototype.xScaleHold = function(e) {
+CreatorState.prototype.xScaleHold = function(e) {
   myState.selection.xs += e.getModifierState('Control') ? -0.1 : 0.1;
   return;
 }
 
-WallState.prototype.yScaleHold = function(e) {
+CreatorState.prototype.yScaleHold = function(e) {
   myState.selection.ys += e.getModifierState('Control') ? -0.1 : 0.1;
   return;
 }
 
-WallState.prototype.resetHold = function() {
+CreatorState.prototype.resetHold = function() {
   myState.selection.xs = 1;
   myState.selection.ys = 1;
   myState.selection.r = 1;
   return;
 }
 
-WallState.prototype.draw = function() {
+CreatorState.prototype.draw = function() {
   // if our state is invalid, redraw
   if (!this.valid) {
     let ctx = this.ctx;
@@ -263,7 +263,7 @@ WallState.prototype.draw = function() {
   }
 }
 
-WallState.prototype.getMouse = function(e) {
+CreatorState.prototype.getMouse = function(e) {
     let rect = this.canvas.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
@@ -280,14 +280,14 @@ function Hold(x, y, r, s) {
   //closure
   myHold = this;
 
-  // positional info
+  // positional info is stored plainly
   myHold.x = x; // x pos
   myHold.y = y; // y pos
   myHold.xs = s; // scale
   myHold.ys = s; // scale
   myHold.r = r; // rotation
 
-  // the width and height depend on the image
+  // the width and height depend on the image and scale
   const holdImage = new Image();
   holdImage.src = this.model;
   holdImage.onload = function() {
