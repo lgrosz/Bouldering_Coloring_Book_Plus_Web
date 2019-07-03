@@ -8,13 +8,116 @@ document.addEventListener('DOMContentLoaded', event => {
     document.getElementById('load-firebase').innerHTML = 'Firebase load was unsuccessful, see console';
   }
   initRouteBrowser();
-  initRouteViewer();
+  //initRouteViewer();
+  init();
 });
 
-function initRouteViewer() {
-  clearWall(false);
+function init() {
+  wall = new ViewerState(document.getElementById('route-canvas'));
+  wall.draw();
 }
 
+function ViewerState(canvas) {
+  // setup canvas dimensions
+  this.div = document.getElementById('route-viewer');
+  this.canvas = canvas;
+  //we will find this out once we draw or we can hardcode it
+  this.scale = null;
+  this.holds = [];
+  this.ctx = canvas.getContext('2d');
+
+  // image storage
+  // {"path": image}
+  this.images = new Object();
+
+  // have to be able to access the object in eventListeners
+  // when I have them that is
+  myState = this;
+}
+
+ViewerState.prototype.clear = function() {
+  this.ctx.clearRect(0, 0, this.width, this.height);
+}
+
+ViewerState.prototype.draw = function() {
+  let ctx = this.ctx;
+  let holds = this.holds;
+  this.clear();
+
+  // background
+  if ('../assets/wall_images/all.png' in myState.images) {
+    image = this.images['../assets/wall_images/all.png'];
+    ctx.drawImage(image, 0, 0, myState.width, myState.height);
+  }
+  else {
+    const wallImage = new Image();
+    wallImage.src = '../assets/wall_images/all.png';
+    wallImage.onload = function() {
+      myState.canvas.height = myState.div.clientHeight;
+      newHeight = myState.canvas.clientHeight;
+      myState.scale = newHeight / wallImage.height;
+      newWidth = myState.scale * wallImage.width;
+      myState.canvas.width = newWidth;
+      myState.width = newWidth;
+      myState.height = newHeight;
+      ctx.drawImage(wallImage, 0, 0, newWidth, newHeight);
+      myState.images['../assets/wall_images/all.png'] = wallImage;
+    }
+  }
+}
+
+ViewerState.prototype.getHoldArrayFB = function(routeDocumentId) {
+  const db = firebase.firestore();
+  let myState = this;
+  holdCollection = db.collection('routes').doc(routeDocumentId).collection('holds');
+  if (holdCollection != null) {
+    holdCollection.get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          let {x, y, r, sx, sy, model} = doc.data();
+          let myHold = new Hold(x, y, r, sx, sy, model);
+          myState.holds.push(myHold);
+          myState.clear();
+          myState.draw();
+          myHold.draw(myState.ctx, myState.scale);
+        });
+      });
+  }
+}
+
+function Hold(x, y, r, sx, sy, model) {
+  this.images = new Object();
+
+  // positional info is stored plainly
+  this.x = x; // x pos
+  this.y = y; // y pos
+  this.r = r; // rotation
+  this.sx = sx; // scale
+  this.sy = sy; // scale
+  this.model = model; // model path
+}
+
+// Draws this shape to a given context
+Hold.prototype.draw = function(ctx, scale) {
+  // draw the hold, load the image if not already loaded
+  let {x, y, r, w, h, sx, sy} = this;
+  x = x * scale;
+  y = y * scale;
+  let myHold = this;
+  // the width and height depend on the image and scale
+  const holdImage = new Image();
+  holdImage.src = this.model;
+  holdImage.onload = function() {
+    w = myHold.sx * holdImage.width
+    h = myHold.sy * holdImage.height
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(r * Math.PI / 180);
+    ctx.drawImage(holdImage, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
+    ctx.restore();
+  }
+}
+/////////////////////////////////////
 function initRouteBrowser() {
 
   routeBrowserDiv = document.getElementById('route-browser');
@@ -37,10 +140,7 @@ function initRouteBrowser() {
                            + '<br />' + setterString;
         var browser = document.getElementById('route-browser');
         button.onclick = function () {
-          // reload browser
-          holdCollection = db.collection('routes').doc(doc.id).collection('holds');
-          clearWall();
-          drawRoute(holdCollection);
+          myState.getHoldArrayFB(doc.id);
         }
         browser.appendChild(button);
       });
@@ -48,76 +148,4 @@ function initRouteBrowser() {
     .catch(function(error) {
       console.log('Error getting documents: ', error);
     });
-}
-
-function clearWall(clearWall=true) {
-  canvas = document.getElementById('route-canvas');
-  ctx = canvas.getContext('2d');
-
-  if (clearWall == true) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  const wallImage = new Image();
-  wallImage.src = '../assets/wall_images/all.png';
-  wallImage.onload = function() {
-    // canvas needs to be the same dimensions
-    getViewerScale(function(scale){
-      height = scale * wallImage.height;
-      width = scale * wallImage.width;
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(wallImage, 0, 0, width, height);
-    });
-  }
-}
-
-function drawRoute(holdCollection) {
-  if (holdCollection != null) {
-    holdCollection.get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          holdData = doc.data();
-          drawHold(holdData);
-        });
-      });
-  }
-}
-
-function drawHold(holdData, holdImage) {
-  //recolor
-  getViewerScale(function(scale) {
-    // scale, place, rotate
-    holdImage = new Image();
-    holdImage.src = holdData.model;
-    holdImage.onload = function() {
-      x = scale * holdData.x;
-      y = scale * holdData.y;
-      s = holdData.scale;
-      r = holdData.r;
-      //move to center, rotate, and draw (at center)
-      drawImage(holdImage, x, y, s, r);
-    }
-  });
-}
-// no need to use save and restore between calls as it sets the transform rather 
-// than multiply it like ctx.rotate ctx.translate ctx.scale and ctx.transform
-// Also combining the scale and origin into the one call makes it quicker
-// x,y position of image center
-// scale scale of image
-// rotation in radians.
-// Thanks to Blindman67 on stackoverflow for this blazingly fast implementation
-function drawImage(image, x, y, scale, rotation){
-    ctx.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
-    ctx.rotate(rotation);
-    ctx.drawImage(image, -image.width / 2, -image.height / 2);
-}  
-
-function getViewerScale(callback) {
-  const wallImage = new Image();
-  wallImage.src = '../assets/wall_images/all.png'
-  wallImage.onload = function() {
-    scale = 0.75 * window.innerHeight / wallImage.height;
-    callback(scale);
-  }
 }

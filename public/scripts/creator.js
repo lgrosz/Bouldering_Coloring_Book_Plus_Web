@@ -299,7 +299,6 @@ function Hold(x, y, r, s) {
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
-  //can do something like {x,y,r,s} = this
   let {x, y, r, w, h, xs, ys} = this;
   if (this.model in this.images) {
     image = this.images[this.model];

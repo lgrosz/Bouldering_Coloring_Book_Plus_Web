@@ -1,3 +1,26 @@
+/* viewer div */
+#route-viewer {
+  /*make the div centralized*/
+  margin:0 auto;
+  height: 90%;
+  /*not sure why this has to be min but okay*/
+  min-width: 90%;
+  /* These are the dimensions of the wall image*/
+  max-height: 3325px;
+  max-width: 1069px;
+  overflow: auto;
+  border: 5px solid gray;
+}
+
+#route-canvas {
+    display: block;
+}
+
+html, body {
+  height: 100vh;
+  width: 100vw;
+}
+
 /* route-browser-button */
 .browser-button {
   display: block;
@@ -9,15 +32,3 @@
   overflow: auto;
 }
 
-/* viewer div */
-#route-viewer {
-    width: 75vw;
-    overflow: auto;
-    border: 5px solid gray;
-    float: left;
-    clear: left;
-}
-
-#route-canvas {
-    display: block;
-}
