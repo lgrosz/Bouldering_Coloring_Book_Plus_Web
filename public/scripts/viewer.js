@@ -19,7 +19,7 @@ function init() {
 
 function ViewerState(canvas) {
   // setup canvas dimensions
-  this.div = document.getElementById('route-viewer');
+  this.div = document.getElementById('wall-div');
   this.canvas = canvas;
   //we will find this out once we draw or we can hardcode it
   this.scale = null;

@@ -3,7 +3,9 @@
   <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' href='styles/viewer.css'>
+    <link rel='stylesheet' type='text/css' href='styles/wall.css'>
+    <link rel='stylesheet' type='text/css' href='styles/sidenav.css'>
+    <link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>
     <title>Bouldering Coloring Book +</title>
     <!-- update the version number as needed -->
     <script defer src='/__/firebase/6.2.2/firebase-app.js'></script>
@@ -17,9 +19,17 @@
   </head>
   <body>
     <script src='scripts/viewer.js'></script>
-      <div id='route-viewer'>
-        <canvas id='route-canvas'></canvas>
-      </div>
-      <div id='route-browser'></div>
+    <div id='wall-div'>
+      <canvas id='route-canvas'></canvas>
+    </div>
+    <div id='route-browser'></div>
+    <div class='sidenav'>
+      <a title='Home' href='index.html'><i class='fa fa-home'></i></a>
+      <a title='Viewer' class='active' href='viewer.html'><i class='fa fa-eye'></i></a>
+      <a title='Creator' href='creator.html'><i class='fa fa-wrench'></i></a>
+      <a title='About' href='about.html'><i class='fa fa-question'></i></a>
+    </div>
+    <div class='sideextra'>
+    </div>
   </body>
 </html>

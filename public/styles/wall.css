@@ -1,9 +1,10 @@
-#route-creator {
+/* viewer div */
+#wall-div{
   /*make the div centralized*/
   margin:0 auto;
   height: 90%;
   /*not sure why this has to be min but okay*/
-  min-width: 90%;
+  min-width: 85%;
   /* These are the dimensions of the wall image*/
   max-height: 3325px;
   max-width: 1069px;
@@ -12,10 +13,22 @@
 }
 
 #route-canvas {
-  display: block;
+    display: block;
 }
 
 html, body {
   height: 100vh;
   width: 100vw;
 }
+
+/* route-browser-button */
+.browser-button {
+  display: block;
+}
+
+/* browser div */
+#route-browser {
+  float:left;
+  overflow: auto;
+}
+
