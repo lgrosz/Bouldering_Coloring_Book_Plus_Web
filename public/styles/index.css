@@ -1,67 +1,25 @@
-#menu-div {
-  height: 95vh;
-  width: 95vw;
-  margin: 2.5vh 2.5vw;
-  text-align: center;
+:root {
+  /* Sizing */
+  --nav-width: 70px;
+  --nav-icon-size: 35px;
 }
 
-#welcome-button {
-    width: 90%;
-    background-color: RoyalBlue;
-    border: 10px solid SteelBlue;
-    border-radius: 50px;
-    text-align: left;
-    font-size: 84px;
-    color: white;
-    display: block;
-    margin: 12px 8px;
-    padding: 15px 32px;
-    cursor: pointer;
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: var(--nav-width); /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: lightgray; */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
 }
 
-#viewer-button {
-    width: 44%;
-    height: 55%;
-    background-color: green;
-    border: 10px solid darkgreen;
-    border-radius: 50px;
-    text-align: left;
-    font-size: 84px;
-    color: white;
-    display: block;
-    margin: 12px 8px;
-    padding: 15px 32px;
-    cursor: pointer;
-    float: left;
-}
-
-#creator-button {
-    width: 44%;
-    height: 55%;
-    background-color: orange;
-    border: 10px solid darkorange;
-    border-radius: 50px;
-    text-align: left;
-    font-size: 84px;
-    color: white;
-    display: block;
-    margin: 12px 8px;
-    padding: 15px 32px;
-    cursor: pointer;
-    float: left;
-}
-
-
-#about-button {
-    width: 90%;
-    background-color: paleVioletRed;
-    border: 10px solid MediumVioletRed;
-    border-radius: 50px;
-    text-align: left;
-    font-size: 84px;
-    color: white;
-    display: block;
-    margin: 12px 8px;
-    padding: 15px 32px;
-    cursor: pointer;
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: var(--nav-icon-size);
+  color: black;
+  display: block;
 }
