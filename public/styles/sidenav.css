@@ -38,7 +38,7 @@
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
-  right: 0;
+  right: 0; /* Stay on the right */
   background-color: lightgray; */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
@@ -58,4 +58,18 @@
 
 .sideextra a.active {
   color: darkgray;
+}
+
+.rightsubmenu {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 0px; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  right: var(--nav-width); /* Stay on the right */
+  background-color: lightgray; */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+  padding-right: 0;
+  /* transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
 }

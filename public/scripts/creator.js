@@ -214,6 +214,7 @@ CreatorState.prototype.resetHold = function() {
 CreatorState.prototype.draw = function() {
   // if our state is invalid, redraw
   if (!this.valid) {
+    console.log('here');
     let ctx = this.ctx;
     let holds = this.holds;
     this.clear();
@@ -310,7 +311,7 @@ Hold.prototype.draw = function(ctx, scale) {
   }
   else {
     console.log('Image wasn\'t ready to be drawn');
-    wall.valid = false;
+    myState.valid = false;
   }
 }
 

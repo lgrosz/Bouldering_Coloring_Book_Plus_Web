@@ -104,9 +104,20 @@ Hold.prototype.draw = function(ctx, scale) {
   x = x * scale;
   y = y * scale;
   let myHold = this;
-  // the width and height depend on the image and scale
   const holdImage = new Image();
-  holdImage.src = this.model;
+  ////
+  // Create a reference to the file we want to download
+  var storage = firebase.storage();
+  var storageRef = storage.ref();
+  var holdModelRef = storageRef.child('holds/sample-hold.png');
+  // Get the download URL
+  holdModelRef.getDownloadURL().then(function(url) {
+    // Insert url into an <img> tag to "download"
+    holdImage.src = url;
+  });
+  ////
+  //holdImage.src = this.model;
+  // the width and height depend on the image and scale
   holdImage.onload = function() {
     w = myHold.sx * holdImage.width
     h = myHold.sy * holdImage.height
@@ -120,7 +131,8 @@ Hold.prototype.draw = function(ctx, scale) {
 /////////////////////////////////////
 function initRouteBrowser() {
 
-  routeBrowserDiv = document.getElementById('route-browser');
+  let routeBrowserDiv = document.getElementById('route-browser');
+  let routeButtonGroup = document.getElementById('route-button-group');
 
   const db = firebase.firestore();
 
@@ -138,14 +150,25 @@ function initRouteBrowser() {
         button.innerHTML = nameString
                            + ' | V' + routeData.grade
                            + '<br />' + setterString;
-        var browser = document.getElementById('route-browser');
         button.onclick = function () {
           myState.getHoldArrayFB(doc.id);
         }
-        browser.appendChild(button);
+        routeButtonGroup.appendChild(button);
       });
     })
     .catch(function(error) {
       console.log('Error getting documents: ', error);
     });
+}
+
+function toggleRouteBrowser() {
+  let browserDiv = document.getElementById('route-browser')
+  if (browserDiv.classList.contains('active')){
+    browserDiv.classList.remove('active');
+    browserDiv.style.width = '0px';
+  }
+  else {
+    browserDiv.classList.add('active');
+    browserDiv.style.width = '250px';
+  }
 }

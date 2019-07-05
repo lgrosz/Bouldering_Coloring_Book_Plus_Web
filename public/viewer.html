@@ -22,7 +22,6 @@
     <div id='wall-div'>
       <canvas id='route-canvas'></canvas>
     </div>
-    <div id='route-browser'></div>
     <div class='sidenav'>
       <a title='Home' href='index.html'><i class='fa fa-home'></i></a>
       <a title='Viewer' class='active' href='viewer.html'><i class='fa fa-eye'></i></a>
@@ -30,6 +29,14 @@
       <a title='About' href='about.html'><i class='fa fa-question'></i></a>
     </div>
     <div class='sideextra'>
+      <a href='javascript:void(0)' class='opensubmenu' onclick='toggleRouteBrowser()'><i class='fa fa-list'></i></a>
+    </div>
+    <div id='route-browser'  class='rightsubmenu'>
+      <input type='text' placeholder='Search...'>
+      <a href='javascript:void(0)' onclick='filterRoutes()'><i class='fa fa-filter'></i></a>
+      <div id='route-button-group'>
+        <!-- Route buttons go here!--!>
+      </div>
     </div>
   </body>
 </html>
