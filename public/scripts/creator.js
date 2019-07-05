@@ -6,13 +6,44 @@ document.addEventListener('DOMContentLoaded', event => {
   } catch (e) {
     console.error(e)
   }
-
   init();
 });
 
 
 function init() {
+  // get all hold images
+  getHoldImages();
+  console.log(holdImages);
+  // make wall
   wall = new CreatorState(document.getElementById('route-canvas'));
+}
+
+function getHoldImages() {
+  holdImages = {};
+
+  const db = firebase.firestore();
+  let storage = firebase.storage();
+  let storageRef = storage.ref();
+
+  db.collection('holds')
+    .get()
+    .then(function(querySnapshot) {
+      querySnapshot.forEach(function(doc) {
+        let holdData = doc.data();
+        let tempImage = new Image();
+        let path = holdData.path;
+        // Create a reference to the file we want to download
+        let holdModelRef = storageRef.child(path);
+        // Get the download URL
+        holdModelRef.getDownloadURL().then(function(url) {
+          // Insert url into an <img> tag to "download"
+          tempImage.src = url;
+          tempImage.onload = function() {
+            holdImages[path] = tempImage;
+          }
+        });
+      });
+    });
 }
 
 function CreatorState(canvas) {
@@ -25,7 +56,7 @@ function CreatorState(canvas) {
 
   // image storage
   // {"path": image}
-  this.images = new Object();
+  this.images = {};
 
   // keep track of the state of the canvas
   this.valid = false; //if false, canvas needs to redraw
@@ -214,7 +245,6 @@ CreatorState.prototype.resetHold = function() {
 CreatorState.prototype.draw = function() {
   // if our state is invalid, redraw
   if (!this.valid) {
-    console.log('here');
     let ctx = this.ctx;
     let holds = this.holds;
     this.clear();
@@ -248,8 +278,6 @@ CreatorState.prototype.draw = function() {
     }
     
     // draw selection border
-    // this is kind of just a visual thing right now...
-    // the actual selecting has nothing to do with this stroke
     if (this.selection != null) {
       let {x, y, w, h, r, xs, ys} = this.selection;
       let scale = this.scale;
@@ -273,46 +301,34 @@ CreatorState.prototype.getMouse = function(e) {
 }
 
 function Hold(x, y, r, s) {
-  // TODO creator position, not aboslute position, saving this will lose
-  //      data!!!! (but is it significant)
-  this.model = '../assets/holds/sample-hold.png'
-  this.images = new Object();
+  // get the model associated with this hold
+  this.model = 'holds/sample-hold.png'
+  this.image = holdImages[this.model]
 
   //closure
   myHold = this;
 
   // positional info is stored plainly
-  myHold.x = x; // x pos
-  myHold.y = y; // y pos
-  myHold.xs = s; // scale
-  myHold.ys = s; // scale
-  myHold.r = r; // rotation
+  this.x = x; // x pos
+  this.y = y; // y pos
+  this.xs = s; // scale
+  this.ys = s; // scale
+  this.r = r; // rotation
 
   // the width and height depend on the image and scale
-  const holdImage = new Image();
-  holdImage.src = this.model;
-  holdImage.onload = function() {
-    myHold.w = myHold.xs * holdImage.width
-    myHold.h = myHold.ys * holdImage.height
-    myHold.images[myHold.model] = holdImage;
-  }
+  this.w = this.xs * this.image.width
+  this.h = this.ys * this.image.height
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
   let {x, y, r, w, h, xs, ys} = this;
-  if (this.model in this.images) {
-    image = this.images[this.model];
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(r * Math.PI / 180);
-    ctx.drawImage(image, -w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
-    ctx.restore();
-  }
-  else {
-    console.log('Image wasn\'t ready to be drawn');
-    myState.valid = false;
-  }
+  let image = this.image;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(r * Math.PI / 180);
+  ctx.drawImage(image, -w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
+  ctx.restore();
 }
 
 // Determine if a point is inside the shape's bounds

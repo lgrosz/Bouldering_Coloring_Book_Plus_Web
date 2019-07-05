@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', event => {
     document.getElementById('load-firebase').innerHTML = 'Firebase load was unsuccessful, see console';
   }
   initRouteBrowser();
-  //initRouteViewer();
   init();
 });
 
@@ -105,18 +104,15 @@ Hold.prototype.draw = function(ctx, scale) {
   y = y * scale;
   let myHold = this;
   const holdImage = new Image();
-  ////
   // Create a reference to the file we want to download
   var storage = firebase.storage();
   var storageRef = storage.ref();
-  var holdModelRef = storageRef.child('holds/sample-hold.png');
+  var holdModelRef = storageRef.child(this.model);
   // Get the download URL
   holdModelRef.getDownloadURL().then(function(url) {
     // Insert url into an <img> tag to "download"
     holdImage.src = url;
   });
-  ////
-  //holdImage.src = this.model;
   // the width and height depend on the image and scale
   holdImage.onload = function() {
     w = myHold.sx * holdImage.width
