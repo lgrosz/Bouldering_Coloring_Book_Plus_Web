@@ -27,7 +27,7 @@ function ViewerState(canvas) {
 
   // image storage
   // {"path": image}
-  this.images = new Object();
+  this.images = {};
 
   // have to be able to access the object in eventListeners
   // when I have them that is
@@ -73,8 +73,8 @@ ViewerState.prototype.getHoldArrayFB = function(routeDocumentId) {
     holdCollection.get()
       .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
-          let {x, y, r, sx, sy, model} = doc.data();
-          let myHold = new Hold(x, y, r, sx, sy, model);
+          let {x, y, r, sx, sy, c, model} = doc.data();
+          let myHold = new Hold(x, y, r, sx, sy, c, model);
           myState.holds.push(myHold);
           myState.clear();
           myState.draw();
@@ -84,8 +84,8 @@ ViewerState.prototype.getHoldArrayFB = function(routeDocumentId) {
   }
 }
 
-function Hold(x, y, r, sx, sy, model) {
-  this.images = new Object();
+function Hold(x, y, r, sx, sy, c, model) {
+  this.images = {};
 
   // positional info is stored plainly
   this.x = x; // x pos
@@ -93,13 +93,14 @@ function Hold(x, y, r, sx, sy, model) {
   this.r = r; // rotation
   this.sx = sx; // scale
   this.sy = sy; // scale
+  this.c = c; // color
   this.model = model; // model path
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
   // draw the hold, load the image if not already loaded
-  let {x, y, r, w, h, sx, sy} = this;
+  let {x, y, r, w, h, sx, sy, c} = this;
   x = x * scale;
   y = y * scale;
   let myHold = this;
@@ -110,7 +111,6 @@ Hold.prototype.draw = function(ctx, scale) {
   var holdModelRef = storageRef.child(this.model);
   // Get the download URL
   holdModelRef.getDownloadURL().then(function(url) {
-    // Insert url into an <img> tag to "download"
     holdImage.src = url;
   });
   // the width and height depend on the image and scale
@@ -121,6 +121,10 @@ Hold.prototype.draw = function(ctx, scale) {
     ctx.translate(x, y);
     ctx.rotate(r * Math.PI / 180);
     ctx.drawImage(holdImage, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
+    ctx.fillStyle = '#' + c;
+    ctx.fill();
     ctx.restore();
   }
 }

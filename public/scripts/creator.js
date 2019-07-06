@@ -232,18 +232,18 @@ CreatorState.prototype.scaleHold = function(e) {
 }
 
 CreatorState.prototype.xScaleHold = function(e) {
-  myState.selection.xs += e.getModifierState('Control') ? -0.1 : 0.1;
+  myState.selection.sx += e.getModifierState('Control') ? -0.1 : 0.1;
   return;
 }
 
 CreatorState.prototype.yScaleHold = function(e) {
-  myState.selection.ys += e.getModifierState('Control') ? -0.1 : 0.1;
+  myState.selection.sy += e.getModifierState('Control') ? -0.1 : 0.1;
   return;
 }
 
 CreatorState.prototype.resetHold = function() {
-  myState.selection.xs = 1;
-  myState.selection.ys = 1;
+  myState.selection.sx = 1;
+  myState.selection.sy = 1;
   myState.selection.r = 1;
   return;
 }
@@ -285,12 +285,12 @@ CreatorState.prototype.draw = function() {
     
     // draw selection border
     if (this.selection != null) {
-      let {x, y, w, h, r, xs, ys} = this.selection;
+      let {x, y, w, h, r, sx, sy} = this.selection;
       let scale = this.scale;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(r * Math.PI / 180);
-      ctx.strokeRect(-w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
+      ctx.strokeRect(-w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
       ctx.restore();
     }
     
@@ -317,27 +317,27 @@ function Hold(x, y, r, s) {
   // positional info is stored plainly
   this.x = x; // x pos
   this.y = y; // y pos
-  this.xs = s; // scale
-  this.ys = s; // scale
+  this.sx = s; // scale
+  this.sy = s; // scale
   this.r = r; // rotation
   this.c = 'ab6e49' // color
 
   // the width and height depend on the image and scale
-  this.w = this.xs * this.image.width
-  this.h = this.ys * this.image.height
+  this.w = this.sx * this.image.width
+  this.h = this.sy * this.image.height
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
-  let {x, y, r, w, h, xs, ys, c} = this;
+  let {x, y, r, w, h, sx, sy, c} = this;
   let image = this.image;
   //so we don't taint the canvas
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(r * Math.PI / 180);
-  ctx.drawImage(image, -w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
+  ctx.drawImage(image, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
   ctx.beginPath();
-  ctx.ellipse(0, 0, w/8*xs*scale, h/8*ys*scale, 0, 0, 2*Math.PI);
+  ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
   ctx.fillStyle = '#' + c;
   ctx.fill();
   //recolor
