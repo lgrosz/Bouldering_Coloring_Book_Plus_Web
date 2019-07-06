@@ -52,6 +52,10 @@
   display: block;
 }
 
+.sideextra a.hidden {
+  display: none;
+}
+
 .sideextra a:hover {
   color: darkgray;
 }

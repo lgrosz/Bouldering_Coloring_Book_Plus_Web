@@ -78,6 +78,7 @@ function CreatorState(canvas) {
 
   // for setting state letiables for mouse down
   canvas.addEventListener('mousedown', function(e) {
+    let editHoldButton = document.getElementById('edit-hold-button');
     let mouse = myState.getMouse(e);
     let mx = mouse.x;
     let my = mouse.y;
@@ -91,9 +92,11 @@ function CreatorState(canvas) {
         myState.selection = mySel;
         myState.dragging = true;
         myState.valid = false;
+        editHoldButton.classList.remove('hidden');
         return;
       }
       myState.selection = null;
+      editHoldButton.classList.add('hidden');
       myState.valid = false;
     }
   });
