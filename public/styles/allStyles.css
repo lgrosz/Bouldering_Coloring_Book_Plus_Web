@@ -4,6 +4,31 @@
   --nav-icon-size: 35px;
 }
 
+html, body {
+  height: 100vh;
+  width: 100vw;
+}
+
+#wall-div{
+  /*make the div centralized*/
+  margin:0 auto;
+  height: 90%;
+  /*not sure why this has to be min but okay*/
+  min-width: 85%;
+  /* These are the dimensions of the wall image*/
+  max-height: 3325px;
+  max-width: 1069px;
+  overflow: auto;
+}
+
+#route-canvas {
+    display: block;
+}
+
+.browser-button {
+  display: block;
+}
+
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
   width: var(--nav-width); /* Set the width of the sidebar */
@@ -14,6 +39,7 @@
   background-color: lightgray; */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
+  border-right: solid darkgray 3px;
 }
 
 .sidenav a {
@@ -39,9 +65,10 @@
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   right: 0; /* Stay on the right */
-  background-color: lightgray; */
+  background-color: lightgray;
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
+  border-left: solid darkgray 3px;
 }
 
 .sideextra a {
@@ -66,14 +93,19 @@
 
 .rightsubmenu {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 0px; /* Set the width of the sidebar */
+  width: 250px; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   right: var(--nav-width); /* Stay on the right */
-  background-color: lightgray; */
+  background-color: lightgray;
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
   padding-right: 0;
-  /* transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+  border-right: solid darkgray 1px;
+  border-left: solid darkgray 3px;
+}
+
+.hidden {
+  display: none;
 }

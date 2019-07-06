@@ -97,6 +97,7 @@ function CreatorState(canvas) {
       }
       myState.selection = null;
       editHoldButton.classList.add('hidden');
+      toggleHoldEdit(forceOff=true);
       myState.valid = false;
     }
   });
@@ -187,6 +188,9 @@ CreatorState.prototype.deleteHold = function() {
     if (holds[i] == myState.selection) {
       myState.holds.splice(i, 1);
       myState.selection = null;
+      let editHoldButton = document.getElementById('edit-hold-button');
+      editHoldButton.classList.add('hidden');
+      toggleHoldEdit(forceOff=true);
       return;
     }
   }
@@ -340,4 +344,15 @@ Hold.prototype.contains = function(mx, my, scale) {
   inXBounds = (mx > this.x - this.w/2*scale) && (mx < this.x + this.w/2*scale)
   inYBounds = (my > this.y - this.h/2*scale) && (my < this.y + this.h/2*scale)
   return (inXBounds && inYBounds);
+}
+
+function toggleHoldEdit(forceOff=false) {
+  let editHoldSubMenu = document.getElementById('editholdsubmenu');
+  if (!forceOff && editHoldSubMenu.classList.contains('hidden')) {
+    editHoldSubMenu.classList.remove('hidden');
+  }
+  else {
+    console.log('hiding');
+    editHoldSubMenu.classList.add('hidden');
+  }
 }

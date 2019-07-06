@@ -127,7 +127,6 @@ Hold.prototype.draw = function(ctx, scale) {
 /////////////////////////////////////
 function initRouteBrowser() {
 
-  let routeBrowserDiv = document.getElementById('route-browser');
   let routeButtonGroup = document.getElementById('route-button-group');
 
   const db = firebase.firestore();
@@ -159,12 +158,12 @@ function initRouteBrowser() {
 
 function toggleRouteBrowser() {
   let browserDiv = document.getElementById('route-browser')
-  if (browserDiv.classList.contains('active')){
-    browserDiv.classList.remove('active');
-    browserDiv.style.width = '0px';
+  if (browserDiv.classList.contains('hidden')){
+    console.log('unhiding');
+    browserDiv.classList.remove('hidden');
   }
   else {
-    browserDiv.classList.add('active');
-    browserDiv.style.width = '250px';
+    console.log('hiding');
+    browserDiv.classList.add('hidden');
   }
 }

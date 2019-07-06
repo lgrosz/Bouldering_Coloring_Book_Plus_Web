@@ -3,8 +3,7 @@
   <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' href='styles/wall.css'>
-    <link rel='stylesheet' type='text/css' href='styles/sidenav.css'>
+    <link rel='stylesheet' type='text/css' href='styles/allStyles.css'>
     <link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>
     <title>Bouldering Coloring Book +</title>
     <!-- update the version number as needed -->
@@ -29,7 +28,12 @@
       <a title='About' href='about.html'><i class='fa fa-question'></i></a>
     </div>
     <div class='sideextra'>
-      <a title='Edit' id='edit-hold-button' class='hidden' href='javascript:void(0)' onclick='toggleEditLink()'><i class='fa fa-edit'></i></a>
+      <a title='Edit' id='edit-hold-button' class='hidden' href='javascript:void(0)' onclick='toggleHoldEdit()'><i class='fa fa-edit'></i></a>
+    </div>
+    <div id='editholdsubmenu' class='rightsubmenu hidden'>
+      <input type='text' name='model'>
+      <input type='text' name='color'>
+      <button type='button'>Apply</button>
     </div>
   </body>
 </html>
