@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', event => {
 function init() {
   // get all hold images
   getHoldImages();
-  console.log(holdImages);
   // make wall
   wall = new CreatorState(document.getElementById('route-canvas'));
 }
@@ -258,7 +257,7 @@ CreatorState.prototype.draw = function() {
     
     // background
     if ('../assets/wall_images/all.png' in myState.images) {
-      image = myState.images['../assets/wall_images/all.png'];
+      let image = myState.images['../assets/wall_images/all.png'];
       ctx.drawImage(image, 0, 0, myState.width, myState.height);
     }
     else {
@@ -321,6 +320,7 @@ function Hold(x, y, r, s) {
   this.xs = s; // scale
   this.ys = s; // scale
   this.r = r; // rotation
+  this.c = 'ab6e49' // color
 
   // the width and height depend on the image and scale
   this.w = this.xs * this.image.width
@@ -329,12 +329,26 @@ function Hold(x, y, r, s) {
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
-  let {x, y, r, w, h, xs, ys} = this;
+  let {x, y, r, w, h, xs, ys, c} = this;
   let image = this.image;
+  //so we don't taint the canvas
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(r * Math.PI / 180);
   ctx.drawImage(image, -w/2*xs*scale, -h/2*ys*scale, w*xs*scale, h*ys*scale);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, w/8*xs*scale, h/8*ys*scale, 0, 0, 2*Math.PI);
+  ctx.fillStyle = '#' + c;
+  ctx.fill();
+  //recolor
+  //let red = parseInt(c.substring(0, 2), 16);
+  //let blue = parseInt(c.substring(2, 4), 16);
+  //let green = parseInt(c.substring(4, 6), 16);
+  // not working because of some cors permissions... How do I do this when I
+  // get images from firebase storage?!
+  //let myImageData = tempctx.getImageData(0, 0, 50, 50);
+      //recolor pixel
+  //ctx.putImageData(myImageData, 0, 0);
   ctx.restore();
 }
 
@@ -352,7 +366,6 @@ function toggleHoldEdit(forceOff=false) {
     editHoldSubMenu.classList.remove('hidden');
   }
   else {
-    console.log('hiding');
     editHoldSubMenu.classList.add('hidden');
   }
 }
