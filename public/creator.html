@@ -22,18 +22,41 @@
       <canvas id='route-canvas' tabindex='1'></canvas>
     </div>
     <div class='sidenav'>
-      <a title='Home' href='index.html'><i class='fa fa-home'></i></a>
-      <a title='Viewer' href='viewer.html'><i class='fa fa-eye'></i></a>
-      <a title='Creator' class='active' href='creator.html'><i class='fa fa-wrench'></i></a>
-      <a title='About' href='about.html'><i class='fa fa-question'></i></a>
+      <a title='Home' href='index.html'>
+        <i class='fa fa-home'></i>
+      </a>
+      <a title='Viewer' href='viewer.html'>
+        <i class='fa fa-eye'></i>
+      </a>
+      <a title='Creator' class='active' href='creator.html'>
+        <i class='fa fa-wrench'></i>
+      </a>
+      <a title='About' href='about.html'>
+        <i class='fa fa-question'></i>
+      </a>
     </div>
     <div class='sideextra'>
       <a title='Edit' id='edit-hold-button' class='hidden' href='javascript:void(0)' onclick='toggleHoldEdit()'><i class='fa fa-edit'></i></a>
+      <a title='Save' id='save-route-button' href='javascript:void(0)' onclick='toggleSaveSubmenu()'><i class='fa fa-save'></i></a>
     </div>
     <div id='editholdsubmenu' class='rightsubmenu hidden'>
-      <input type='text' name='model'>
-      <input type='text' name='color'>
-      <button type='button'>Apply</button>
+      Position: <br />
+      x: <input id='ehsm-x' type='number'><br />
+      y: <input id='ehsm-y' type='number'><br />
+      r: <input id='ehsm-r' type='number'><br /><br />
+      Scaling: <br />
+      sx: <input id='ehsm-sx' type='number'><br />
+      sy: <input id='ehsm-sy' type='number'><br /><br />
+      Model: <br />
+      path: <input id='ehsm-path' type='text'><br />
+      color: <input id='ehsm-color' type='text'><br /><br />
+      <button type='button' onclick='applyHoldChanges()'>Apply</button>
+    </div>
+    <div id='saveroutesubmenu' class='rightsubmenu hidden'>
+      <input id='save-name' type='text' placeholder='Name'>
+      <input id='save-grade' type='text' placeholder='Grade'>
+      <input id='save-setter' type='text' placeholder='Setter'>
+      <button type='button' onclick='saveRouteToFirestore()'>Save</button>
     </div>
   </body>
 </html>

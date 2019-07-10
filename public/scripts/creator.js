@@ -283,8 +283,9 @@ CreatorState.prototype.draw = function() {
       holds[i].draw(ctx, myState.scale);
     }
     
-    // draw selection border
+    // do selection specific modifications
     if (this.selection != null) {
+      fixupEditMenu(this.selection);
       let {x, y, w, h, r, sx, sy} = this.selection;
       let scale = this.scale;
       ctx.save();
@@ -293,7 +294,6 @@ CreatorState.prototype.draw = function() {
       ctx.strokeRect(-w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
       ctx.restore();
     }
-    
     this.valid = true;
   }
 }
@@ -309,7 +309,6 @@ CreatorState.prototype.getMouse = function(e) {
 function Hold(x, y, r, s) {
   // get the model associated with this hold
   this.model = 'holds/sample-hold.png'
-  this.image = holdImages[this.model]
 
   //closure
   myHold = this;
@@ -321,16 +320,19 @@ function Hold(x, y, r, s) {
   this.sy = s; // scale
   this.r = r; // rotation
   this.c = 'ab6e49' // color
-
-  // the width and height depend on the image and scale
-  this.w = this.sx * this.image.width
-  this.h = this.sy * this.image.height
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
-  let {x, y, r, w, h, sx, sy, c} = this;
-  let image = this.image;
+  let {x, y, r, sx, sy, c} = this;
+  let image = holdImages[this.model];
+
+  // the width and height depend on the image and scale
+  let w = this.sx * image.width;
+  let h = this.sy * image.height;
+  this.w = w;
+  this.h = h;
+
   //so we don't taint the canvas
   ctx.save();
   ctx.translate(x, y);
@@ -361,11 +363,81 @@ Hold.prototype.contains = function(mx, my, scale) {
 }
 
 function toggleHoldEdit(forceOff=false) {
-  let editHoldSubMenu = document.getElementById('editholdsubmenu');
-  if (!forceOff && editHoldSubMenu.classList.contains('hidden')) {
-    editHoldSubMenu.classList.remove('hidden');
+  let editHoldsubmenu = document.getElementById('editholdsubmenu');
+  if (!forceOff && editHoldsubmenu.classList.contains('hidden')) {
+    editHoldsubmenu.classList.remove('hidden');
   }
   else {
-    editHoldSubMenu.classList.add('hidden');
+    editHoldsubmenu.classList.add('hidden');
   }
+}
+
+function fixupEditMenu(selection) {
+  document.getElementById('ehsm-x').value = selection.x;
+  document.getElementById('ehsm-y').value = selection.y;
+  document.getElementById('ehsm-r').value = selection.r;
+  document.getElementById('ehsm-sx').value = selection.sx;
+  document.getElementById('ehsm-sy').value = selection.sy;
+  document.getElementById('ehsm-path').value = selection.model;
+  document.getElementById('ehsm-color').value = selection.c;
+}
+
+function applyHoldChanges() {
+  myState.selection.x = document.getElementById('ehsm-x').value;
+  myState.selection.y = document.getElementById('ehsm-y').value;
+  myState.selection.r = document.getElementById('ehsm-r').value;
+  myState.selection.sx = document.getElementById('ehsm-sx').value;
+  myState.selection.sy = document.getElementById('ehsm-sy').value;
+  myState.selection.model = document.getElementById('ehsm-path').value;
+  myState.selection.c = document.getElementById('ehsm-color').value;
+  //check if all of these are valid first
+  myState.valid = false;
+}
+
+function toggleSaveSubmenu(forceOff=false) {
+  let saveSubmenu = document.getElementById('saveroutesubmenu');
+  if (!forceOff && saveSubmenu.classList.contains('hidden')) {
+    saveSubmenu.classList.remove('hidden');
+  }
+  else {
+    saveSubmenu.classList.add('hidden');
+  }
+}
+
+function saveRouteToFirestore() {
+  //retrieve name, grade, and setter fields
+  let name = document.getElementById('save-name').value;
+  let grade = document.getElementById('save-grade').value;
+  let setter = document.getElementById('save-setter').value;
+  //if any are empty, throw error to screen
+  //create data to save
+  let route = {};
+  let holds = [];
+  for (let i = 0; i < myState.holds.length; i++) {
+    let holdState = myState.holds[i];
+    let hold = {};
+    hold['x'] = holdState.x / myState.scale;
+    hold['y'] = holdState.y / myState.scale;
+    hold['r'] = holdState.r;
+    hold['c'] = holdState.c;
+    hold['sx'] = holdState.sx;
+    hold['sy'] = holdState.sy;
+    hold['model'] = holdState.model;
+    holds.push(hold);
+  }
+  route['name'] = name;
+  route['grade'] = grade;
+  route['setter'] = setter;
+  route['holds'] = holds
+  console.log(route);
+  //if route already exists, throw error to screen
+  //else save route to fs
+  const db = firebase.firestore();
+  db.collection('routes').add(route)
+    .then(function() {
+      console.log('Document successfully written!');
+    })
+    .catch(function() {
+      console.log('Error writing document.')
+    });
 }

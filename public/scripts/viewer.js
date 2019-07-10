@@ -40,7 +40,6 @@ ViewerState.prototype.clear = function() {
 
 ViewerState.prototype.draw = function() {
   let ctx = this.ctx;
-  let holds = this.holds;
   this.clear();
 
   // background
@@ -65,69 +64,64 @@ ViewerState.prototype.draw = function() {
   }
 }
 
-ViewerState.prototype.getHoldArrayFB = function(routeDocumentId) {
+ViewerState.prototype.drawRoute = function(routeDocumentId) {
   const db = firebase.firestore();
   let myState = this;
-  holdCollection = db.collection('routes').doc(routeDocumentId).collection('holds');
-  if (holdCollection != null) {
-    holdCollection.get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          let {x, y, r, sx, sy, c, model} = doc.data();
-          let myHold = new Hold(x, y, r, sx, sy, c, model);
-          myState.holds.push(myHold);
-          myState.clear();
-          myState.draw();
-          myHold.draw(myState.ctx, myState.scale);
-        });
+  routeDoc = db.collection('routes').doc(routeDocumentId);
+  if (routeDoc != null) {
+    this.draw();
+    routeDoc.get()
+      .then(function(doc) {
+        routeData = doc.data();
+        for (let i = 0; i < routeData.holds.length; i++) {
+          let holdData = routeData.holds[i];
+          loadImage(holdData.model)
+            .then(image => {
+              drawHold(myState.ctx, myState.scale, holdData, image);
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        }
+      })
+      .catch(function(error) {
+        console.log('Error getting document:', error);
       });
   }
 }
 
-function Hold(x, y, r, sx, sy, c, model) {
-  this.images = {};
 
-  // positional info is stored plainly
-  this.x = x; // x pos
-  this.y = y; // y pos
-  this.r = r; // rotation
-  this.sx = sx; // scale
-  this.sy = sy; // scale
-  this.c = c; // color
-  this.model = model; // model path
+function loadImage(path) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.addEventListener("load", () => resolve(img));
+    img.addEventListener("error", err => reject(err));
+    // get image from firebase storage
+    const storage = firebase.storage();
+    const storageRef = storage.ref().child(path);
+    storageRef.getDownloadURL().then( url => {
+      img.src = url;
+    });
+  });
 }
 
-// Draws this shape to a given context
-Hold.prototype.draw = function(ctx, scale) {
-  // draw the hold, load the image if not already loaded
-  let {x, y, r, w, h, sx, sy, c} = this;
+function drawHold(ctx, scale, holdData, image) {
+  let {x, y, r, sx, sy, c} = holdData;
   x = x * scale;
   y = y * scale;
-  let myHold = this;
-  const holdImage = new Image();
-  // Create a reference to the file we want to download
-  var storage = firebase.storage();
-  var storageRef = storage.ref();
-  var holdModelRef = storageRef.child(this.model);
-  // Get the download URL
-  holdModelRef.getDownloadURL().then(function(url) {
-    holdImage.src = url;
-  });
-  // the width and height depend on the image and scale
-  holdImage.onload = function() {
-    w = myHold.sx * holdImage.width
-    h = myHold.sy * holdImage.height
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(r * Math.PI / 180);
-    ctx.drawImage(holdImage, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
-    ctx.fillStyle = '#' + c;
-    ctx.fill();
-    ctx.restore();
-  }
+  let w = sx * image.width
+  let h = sy * image.height
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(r * Math.PI / 180);
+  ctx.drawImage(image, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
+  ctx.fillStyle = '#' + c;
+  ctx.fill();
+  ctx.restore();
 }
+
 /////////////////////////////////////
 function initRouteBrowser() {
 
@@ -150,7 +144,8 @@ function initRouteBrowser() {
                            + ' | V' + routeData.grade
                            + '<br />' + setterString;
         button.onclick = function () {
-          myState.getHoldArrayFB(doc.id);
+          myState.drawRoute(doc.id);
+          console.log(doc.id);
         }
         routeButtonGroup.appendChild(button);
       });
