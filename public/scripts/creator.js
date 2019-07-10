@@ -55,6 +55,7 @@ function CreatorState(canvas) {
 
   // image storage
   // {"path": image}
+  this.backgroundImage = null;
   this.images = {};
 
   // keep track of the state of the canvas
@@ -248,33 +249,48 @@ CreatorState.prototype.resetHold = function() {
   return;
 }
 
+CreatorState.prototype.clear = function() {
+  this.ctx.clearRect(0, 0, this.width, this.height);
+}
+
+CreatorState.prototype.drawBackground = function() {
+  let ctx = this.ctx;
+  let myState = this;
+
+  if (this.backgroundImage === null) {
+    loadImage('walls/sdsmt/all.png')
+      .then(image => {
+        myState.canvas.height = myState.div.clientHeight;
+        newHeight = myState.canvas.clientHeight;
+        myState.scale = newHeight / image.height;
+        newWidth = myState.scale * image.width;
+        myState.canvas.width = newWidth;
+        myState.width = newWidth;
+        myState.height = newHeight;
+        ctx.drawImage(image, 0, 0, newWidth, newHeight);
+        myState.backgroundImage = image;
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+  else {
+    ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+  }
+}
+
+CreatorState.prototype.resetWall = function() {
+  this.clear();
+  this.drawBackground();
+}
+
 CreatorState.prototype.draw = function() {
   // if our state is invalid, redraw
   if (!this.valid) {
     let ctx = this.ctx;
     let holds = this.holds;
-    this.clear();
     
-    // background
-    if ('../assets/wall_images/all.png' in myState.images) {
-      let image = myState.images['../assets/wall_images/all.png'];
-      ctx.drawImage(image, 0, 0, myState.width, myState.height);
-    }
-    else {
-      const wallImage = new Image();
-      wallImage.src = '../assets/wall_images/all.png';
-      wallImage.onload = function() {
-        myState.canvas.height = myState.div.clientHeight;
-        newHeight = myState.canvas.clientHeight;
-        myState.scale = newHeight / wallImage.height;
-        newWidth = myState.scale * wallImage.width;
-        myState.canvas.width = newWidth;
-        myState.width = newWidth;
-        myState.height = newHeight;
-        ctx.drawImage(wallImage, 0, 0, newWidth, newHeight);
-      myState.images['../assets/wall_images/all.png'] = wallImage;
-      }
-    }
+    this.resetWall();
     
     // draw all holds
     let l = holds.length;
@@ -440,4 +456,18 @@ function saveRouteToFirestore() {
     .catch(function() {
       console.log('Error writing document.')
     });
+}
+
+function loadImage(path) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.addEventListener("load", () => resolve(img));
+    img.addEventListener("error", err => reject(err));
+    // get image from firebase storage
+    const storage = firebase.storage();
+    const storageRef = storage.ref().child(path);
+    storageRef.getDownloadURL().then( url => {
+      img.src = url;
+    });
+  });
 }

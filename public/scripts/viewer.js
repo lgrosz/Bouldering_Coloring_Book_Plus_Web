@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', event => {
     console.error(e)
     document.getElementById('load-firebase').innerHTML = 'Firebase load was unsuccessful, see console';
   }
-  initRouteBrowser();
   init();
 });
 
 function init() {
   wall = new ViewerState(document.getElementById('route-canvas'));
-  wall.draw();
+  wall.drawBackground();
+  initRouteBrowser();
 }
 
 function ViewerState(canvas) {
@@ -27,41 +27,47 @@ function ViewerState(canvas) {
 
   // image storage
   // {"path": image}
-  this.images = {};
+  this.backgroundImage = null;
 
   // have to be able to access the object in eventListeners
   // when I have them that is
   myState = this;
+
 }
 
 ViewerState.prototype.clear = function() {
   this.ctx.clearRect(0, 0, this.width, this.height);
 }
 
-ViewerState.prototype.draw = function() {
+ViewerState.prototype.drawBackground = function() {
   let ctx = this.ctx;
-  this.clear();
+  let myState = this;
 
-  // background
-  if ('../assets/wall_images/all.png' in myState.images) {
-    image = this.images['../assets/wall_images/all.png'];
-    ctx.drawImage(image, 0, 0, myState.width, myState.height);
+  if (this.backgroundImage === null) {
+    loadImage('walls/sdsmt/all.png')
+      .then(image => {
+        myState.canvas.height = myState.div.clientHeight;
+        newHeight = myState.canvas.clientHeight;
+        myState.scale = newHeight / image.height;
+        newWidth = myState.scale * image.width;
+        myState.canvas.width = newWidth;
+        myState.width = newWidth;
+        myState.height = newHeight;
+        ctx.drawImage(image, 0, 0, newWidth, newHeight);
+        myState.backgroundImage = image;
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }
   else {
-    const wallImage = new Image();
-    wallImage.src = '../assets/wall_images/all.png';
-    wallImage.onload = function() {
-      myState.canvas.height = myState.div.clientHeight;
-      newHeight = myState.canvas.clientHeight;
-      myState.scale = newHeight / wallImage.height;
-      newWidth = myState.scale * wallImage.width;
-      myState.canvas.width = newWidth;
-      myState.width = newWidth;
-      myState.height = newHeight;
-      ctx.drawImage(wallImage, 0, 0, newWidth, newHeight);
-      myState.images['../assets/wall_images/all.png'] = wallImage;
-    }
+    ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
   }
+}
+
+ViewerState.prototype.resetWall = function() {
+  this.clear();
+  this.drawBackground();
 }
 
 ViewerState.prototype.drawRoute = function(routeDocumentId) {
@@ -69,20 +75,24 @@ ViewerState.prototype.drawRoute = function(routeDocumentId) {
   let myState = this;
   routeDoc = db.collection('routes').doc(routeDocumentId);
   if (routeDoc != null) {
-    this.draw();
+    this.resetWall();
     routeDoc.get()
       .then(function(doc) {
         routeData = doc.data();
-        for (let i = 0; i < routeData.holds.length; i++) {
-          let holdData = routeData.holds[i];
+        //best way to do this would be to resolve ALL promises for images
+        //then clear the route, then draw the holds so there can't be
+        //multiple routes up at the same time.
+        //problem: how do I associate the promise array with specific
+        //holds on the route?
+        routeData.holds.forEach(holdData => {
           loadImage(holdData.model)
             .then(image => {
-              drawHold(myState.ctx, myState.scale, holdData, image);
+              myState.drawHold(holdData, image);
             })
             .catch(err => {
               console.error(err);
             });
-        }
+        });
       })
       .catch(function(error) {
         console.log('Error getting document:', error);
@@ -90,22 +100,9 @@ ViewerState.prototype.drawRoute = function(routeDocumentId) {
   }
 }
 
-
-function loadImage(path) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.addEventListener("load", () => resolve(img));
-    img.addEventListener("error", err => reject(err));
-    // get image from firebase storage
-    const storage = firebase.storage();
-    const storageRef = storage.ref().child(path);
-    storageRef.getDownloadURL().then( url => {
-      img.src = url;
-    });
-  });
-}
-
-function drawHold(ctx, scale, holdData, image) {
+ViewerState.prototype.drawHold = function(holdData, image) {
+  let ctx = this.ctx;
+  let scale = this.scale;
   let {x, y, r, sx, sy, c} = holdData;
   x = x * scale;
   y = y * scale;
@@ -120,6 +117,20 @@ function drawHold(ctx, scale, holdData, image) {
   ctx.fillStyle = '#' + c;
   ctx.fill();
   ctx.restore();
+}
+
+function loadImage(path) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.addEventListener("load", () => resolve(img));
+    img.addEventListener("error", err => reject(err));
+    // get image from firebase storage
+    const storage = firebase.storage();
+    const storageRef = storage.ref().child(path);
+    storageRef.getDownloadURL().then( url => {
+      img.src = url;
+    });
+  });
 }
 
 /////////////////////////////////////
