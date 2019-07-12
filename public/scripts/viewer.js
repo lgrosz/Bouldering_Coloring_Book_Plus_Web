@@ -106,8 +106,8 @@ ViewerState.prototype.drawHold = function(holdData, image) {
   let {x, y, r, sx, sy, c} = holdData;
   x = x * scale;
   y = y * scale;
-  let w = sx * image.width
-  let h = sy * image.height
+  let w = image.width
+  let h = image.height
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(r * Math.PI / 180);
@@ -169,11 +169,9 @@ function initRouteBrowser() {
 function toggleRouteBrowser() {
   let browserDiv = document.getElementById('route-browser')
   if (browserDiv.classList.contains('hidden')){
-    console.log('unhiding');
     browserDiv.classList.remove('hidden');
   }
   else {
-    console.log('hiding');
     browserDiv.classList.add('hidden');
   }
 }

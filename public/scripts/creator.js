@@ -1,48 +1,62 @@
 document.addEventListener('DOMContentLoaded', event => {
-  // load firebase app
   try {
     const app = firebase.app();
     console.log('Firebase was loaded');
   } catch (e) {
     console.error(e)
   }
-  init();
+
+  loadImportantAssets()
+    .then(assetsObject => {
+      //GLOBAL (ugly but it'll do for now)
+      assets = assetsObject
+      init();
+    });
 });
 
-
-function init() {
-  // get all hold images
-  getHoldImages();
-  // make wall
-  wall = new CreatorState(document.getElementById('route-canvas'));
+function loadImportantAssets() {
+  //TODO move this somewhere else
+  editMenuModelSelect = document.getElementById('ehsm-path');
+  imagesPromise = new Promise(function(resolve, reject) {
+    imagesObject = {};
+    pathArray = [];
+    imagesPromiseArray = [];
+    // get all hold image paths from firestore 
+    const db = firebase.firestore();
+    db.collection('asset-paths')
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          // create promise array for images
+          // create a parallel path array
+          let holdData = doc.data();
+          let path = holdData.path;
+          //TODO move this somewhere else
+          if (path.includes('holds')) {
+            let option = document.createElement('option');
+            option.text = path;
+            editMenuModelSelect.add(option);
+          }
+          imagesPromiseArray.push(loadImage(path));
+          pathArray.push(path);
+        });
+        Promise.all(imagesPromiseArray)
+          .then(imagesArray => {
+            // when all images resolve, map the two parallel
+            // arrays together
+            pathArray.forEach(function(key, index) {
+              imagesObject[key] = imagesArray[index];
+            });
+            resolve(imagesObject);
+          });
+      });
+  });
+  return imagesPromise;
 }
 
-function getHoldImages() {
-  holdImages = {};
 
-  const db = firebase.firestore();
-  let storage = firebase.storage();
-  let storageRef = storage.ref();
-
-  db.collection('holds')
-    .get()
-    .then(function(querySnapshot) {
-      querySnapshot.forEach(function(doc) {
-        let holdData = doc.data();
-        let tempImage = new Image();
-        let path = holdData.path;
-        // Create a reference to the file we want to download
-        let holdModelRef = storageRef.child(path);
-        // Get the download URL
-        holdModelRef.getDownloadURL().then(function(url) {
-          // Insert url into an <img> tag to "download"
-          tempImage.src = url;
-          tempImage.onload = function() {
-            holdImages[path] = tempImage;
-          }
-        });
-      });
-    });
+function init(imagesObject) {
+  wall = new CreatorState(document.getElementById('route-canvas'));
 }
 
 function CreatorState(canvas) {
@@ -55,8 +69,7 @@ function CreatorState(canvas) {
 
   // image storage
   // {"path": image}
-  this.backgroundImage = null;
-  this.images = {};
+  this.backgroundImage = assets['walls/sdsmt/all.png'];
 
   // keep track of the state of the canvas
   this.valid = false; //if false, canvas needs to redraw
@@ -255,28 +268,13 @@ CreatorState.prototype.clear = function() {
 
 CreatorState.prototype.drawBackground = function() {
   let ctx = this.ctx;
-  let myState = this;
 
-  if (this.backgroundImage === null) {
-    loadImage('walls/sdsmt/all.png')
-      .then(image => {
-        myState.canvas.height = myState.div.clientHeight;
-        newHeight = myState.canvas.clientHeight;
-        myState.scale = newHeight / image.height;
-        newWidth = myState.scale * image.width;
-        myState.canvas.width = newWidth;
-        myState.width = newWidth;
-        myState.height = newHeight;
-        ctx.drawImage(image, 0, 0, newWidth, newHeight);
-        myState.backgroundImage = image;
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-  else {
-    ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
-  }
+  this.canvas.height = this.div.clientHeight;
+  this.height = this.canvas.clientHeight;
+  this.scale = this.height / this.backgroundImage.height;
+  this.width = this.scale * this.backgroundImage.width;
+  this.canvas.width = this.width;
+  ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
 }
 
 CreatorState.prototype.resetWall = function() {
@@ -335,17 +333,17 @@ function Hold(x, y, r, s) {
   this.sx = s; // scale
   this.sy = s; // scale
   this.r = r; // rotation
-  this.c = 'ab6e49' // color
+  this.c = '000000' // color
 }
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
   let {x, y, r, sx, sy, c} = this;
-  let image = holdImages[this.model];
+  let image = assets[this.model];
 
   // the width and height depend on the image and scale
-  let w = this.sx * image.width;
-  let h = this.sy * image.height;
+  let w = image.width;
+  let h = image.height;
   this.w = w;
   this.h = h;
 
@@ -394,16 +392,16 @@ function fixupEditMenu(selection) {
   document.getElementById('ehsm-r').value = selection.r;
   document.getElementById('ehsm-sx').value = selection.sx;
   document.getElementById('ehsm-sy').value = selection.sy;
-  document.getElementById('ehsm-path').value = selection.model;
   document.getElementById('ehsm-color').value = selection.c;
+  document.getElementById('ehsm-path').value = selection.model;
 }
 
 function applyHoldChanges() {
-  myState.selection.x = document.getElementById('ehsm-x').value;
-  myState.selection.y = document.getElementById('ehsm-y').value;
-  myState.selection.r = document.getElementById('ehsm-r').value;
-  myState.selection.sx = document.getElementById('ehsm-sx').value;
-  myState.selection.sy = document.getElementById('ehsm-sy').value;
+  myState.selection.x = parseInt(document.getElementById('ehsm-x').value);
+  myState.selection.y = parseInt(document.getElementById('ehsm-y').value);
+  myState.selection.r = parseInt(document.getElementById('ehsm-r').value);
+  myState.selection.sx = parseFloat(document.getElementById('ehsm-sx').value);
+  myState.selection.sy = parseFloat(document.getElementById('ehsm-sy').value);
   myState.selection.model = document.getElementById('ehsm-path').value;
   myState.selection.c = document.getElementById('ehsm-color').value;
   //check if all of these are valid first
@@ -445,7 +443,6 @@ function saveRouteToFirestore() {
   route['grade'] = grade;
   route['setter'] = setter;
   route['holds'] = holds
-  console.log(route);
   //if route already exists, throw error to screen
   //else save route to fs
   const db = firebase.firestore();
