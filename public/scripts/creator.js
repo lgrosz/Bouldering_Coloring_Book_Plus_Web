@@ -468,3 +468,9 @@ function loadImage(path) {
     });
   });
 }
+
+function updateHoldPreview() {
+  previewImage = document.getElementById('hold-preview');
+  selection = document.getElementById('ehsm-path').value;
+  previewImage.src = assets[selection].src;
+}

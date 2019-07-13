@@ -109,3 +109,21 @@ html, body {
 .hidden {
   display: none;
 }
+
+.img-div {
+  height: 100px;
+  width: 100%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.preview {
+  vertical-align: middle;
+  margin: 0 auto;
+}
+
+.helper {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}

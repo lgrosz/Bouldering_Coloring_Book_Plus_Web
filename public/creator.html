@@ -49,8 +49,13 @@
       sy: <input id='ehsm-sy' type='number'><br /><br />
       Model: <br />
       color: <input id='ehsm-color' type='text'><br />
-      path: <select id='ehsm-path' type='text'>
+      path: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'>
             </select><br /><br />
+      Preview: <br />
+      <div class='img-div'>
+        <span class='helper'></span>
+        <img id='hold-preview' class='preview'></img>
+      </div>
       <button type='button' onclick='applyHoldChanges()'>Apply</button>
     </div>
     <div id='saveroutesubmenu' class='rightsubmenu hidden'>
