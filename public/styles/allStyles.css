@@ -1,7 +1,9 @@
 :root {
   /* Sizing */
   --nav-width: 70px;
+  --nav-width-x2: 320px;
   --nav-icon-size: 35px;
+  --submenu-width: 250px;
 }
 
 html, body {
@@ -93,11 +95,26 @@ html, body {
 
 .rightsubmenu {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 250px; /* Set the width of the sidebar */
+  width: var(--submenu-width); /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   right: var(--nav-width); /* Stay on the right */
+  background-color: lightgray;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+  padding-right: 0;
+  border-right: solid darkgray 1px;
+  border-left: solid darkgray 3px;
+}
+
+.rightsubsubmenu {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: var(--submenu-width); /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  right: var(--nav-width-x2); /* Stay on the right */
   background-color: lightgray;
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
@@ -126,4 +143,41 @@ html, body {
   display: inline-block;
   height: 100%;
   vertical-align: middle;
+}
+
+/***********************/
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
 }

@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', event => {
     .then(assetsObject => {
       //GLOBAL (ugly but it'll do for now)
       assets = assetsObject
+      populateHoldBrowser();
       init();
     });
 });
@@ -382,6 +383,7 @@ function toggleHoldEdit(forceOff=false) {
     editHoldsubmenu.classList.remove('hidden');
   }
   else {
+    toggleHoldBrowser(forceOff=true);
     editHoldsubmenu.classList.add('hidden');
   }
 }
@@ -470,7 +472,63 @@ function loadImage(path) {
 }
 
 function updateHoldPreview() {
-  previewImage = document.getElementById('hold-preview');
-  selection = document.getElementById('ehsm-path').value;
+  let previewImage = document.getElementById('hold-preview');
+  let selection = document.getElementById('ehsm-path').value;
   previewImage.src = assets[selection].src;
+}
+
+function toggleHoldBrowser(forceOff=false) {
+  let saveSubmenu = document.getElementById('holdbrowser');
+  if (!forceOff && saveSubmenu.classList.contains('hidden')) {
+    saveSubmenu.classList.remove('hidden');
+  }
+  else {
+    saveSubmenu.classList.add('hidden');
+  }
+}
+
+//////////////
+function openHoldType(evt, holdType) {
+  // Declare all variables
+  let i, tabcontent, tablinks;
+
+  // Get all elements with class='tabcontent' and hide them
+  tabcontent = document.getElementsByClassName('tabcontent');
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = 'none';
+  }
+
+  // Get all elements with class='tablinks' and remove the class 'active'
+  tablinks = document.getElementsByClassName('tablinks');
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(' active', '');
+  }
+
+  // Show the current tab, and add an 'active' class to the button that opened the tab
+  document.getElementById(holdType).style.display = 'block';
+  evt.currentTarget.className += ' active';
+}
+///////////////
+function populateHoldBrowser() {
+  //this is kind of hacky, especially with the string work
+  //this should be changed later TODO
+  //maybe not using assets for this and have a hold
+  //collection in firebase in addition to the assets
+  const entries = Object.entries(assets);
+  for (const [path, img] of entries) {
+    if (path.includes('holds')) {
+      let idx1 = path.indexOf('/') + 1;
+      let idx2 = path.lastIndexOf('/');
+      let typestr = path.substr(idx1, idx2 - idx1);
+      if (typestr.length > 0) {
+        let par = document.getElementById(typestr + 'list');
+        let imgchild = par.appendChild(img);
+        imgchild.addEventListener('click', function(){ 
+          let selectionEl = document.getElementById('ehsm-path');
+          selectionEl.value = path;
+          updateHoldPreview();
+        });
+      }
+    }
+  }
 }

@@ -47,10 +47,11 @@
       Scaling: <br />
       sx: <input id='ehsm-sx' type='number'><br />
       sy: <input id='ehsm-sy' type='number'><br /><br />
-      Model: <br />
+      Hold: <br />
       color: <input id='ehsm-color' type='text'><br />
-      path: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'>
-            </select><br /><br />
+      Model: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'>
+            </select><br />
+            <button onclick='toggleHoldBrowser()'>Browse</button><br /><br />
       Preview: <br />
       <div class='img-div'>
         <span class='helper'></span>
@@ -63,6 +64,41 @@
       <input id='save-grade' type='text' placeholder='Grade'>
       <input id='save-setter' type='text' placeholder='Setter'>
       <button type='button' onclick='saveRouteToFirestore()'>Save</button>
+    </div>
+    <div id='holdbrowser' class='rightsubsubmenu hidden'>
+      <!-- Tab links -->
+      <div class="tab">
+        <button class="tablinks" onclick="openHoldType(event, 'Jugs')">Jugs</button>
+        <button class="tablinks" onclick="openHoldType(event, 'Pinches')">Pinches</button>
+        <button class="tablinks" onclick="openHoldType(event, 'Crimps')">Crimps</button>
+        <button class="tablinks" onclick="openHoldType(event, 'Slopers')">Slopers</button>
+        <button class="tablinks" onclick="openHoldType(event, 'Pockets')">Pockets</button>
+        <button class="tablinks" onclick="openHoldType(event, 'Jibs')">Jibs</button>
+      </div>
+      <div id="Jugs" class="tabcontent">
+        <h3>Jugs</h3>
+        <p id='jugslist'></p>
+      </div>
+      <div id="Pinches" class="tabcontent">
+        <h3>Pinches</h3>
+        <p id='pincheslist'></p> 
+      </div>
+      <div id="Crimps" class="tabcontent">
+        <h3>Crmips</h3>
+        <p id='crimpslist'></p>
+      </div>
+      <div id="Slopers" class="tabcontent">
+        <h3>Slopers</h3>
+        <p id='sloperslist'></p>
+      </div>
+      <div id="Pockets" class="tabcontent">
+        <h3>Pockets</h3>
+        <p id='pocketslist'></p>
+      </div>
+      <div id="Jibs" class="tabcontent">
+        <h3>Jibs</h3>
+        <p id='jibslist'></p>
+      </div>
     </div>
   </body>
 </html>
