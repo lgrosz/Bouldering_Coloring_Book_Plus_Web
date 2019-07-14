@@ -11,12 +11,21 @@ html, body {
   width: 100vw;
 }
 
+.center {
+  /*make the div centralized*/
+  text-align: center;
+  height: 100%;
+  overflow: auto;
+}
+
+.fitwidth {
+  width: 80%;
+}
+
 #wall-div{
   /*make the div centralized*/
-  margin:0 auto;
-  height: 90%;
-  /*not sure why this has to be min but okay*/
-  min-width: 85%;
+  margin: 0 auto;
+  height: 100%;
   /* These are the dimensions of the wall image*/
   max-height: 3325px;
   max-width: 1069px;
