@@ -14,6 +14,8 @@ function init() {
   wall = new ViewerState(document.getElementById('route-canvas'));
   wall.drawBackground();
   initRouteBrowser();
+  document.getElementById('routetitle').innerHTML = 'Select route in browser';
+  document.getElementById('routesetter').innerHTML = '(to the left)';
 }
 
 function ViewerState(canvas) {
@@ -24,9 +26,6 @@ function ViewerState(canvas) {
   this.scale = null;
   this.holds = [];
   this.ctx = canvas.getContext('2d');
-
-  // image storage
-  // {"path": image}
   this.backgroundImage = null;
 
   // have to be able to access the object in eventListeners
@@ -46,8 +45,8 @@ ViewerState.prototype.drawBackground = function() {
   if (this.backgroundImage === null) {
     loadImage('walls/sdsmt/all.png')
       .then(image => {
-        myState.canvas.height = myState.div.clientHeight;
-        newHeight = myState.canvas.clientHeight;
+        newHeight = myState.div.clientHeight - 200;
+        myState.canvas.height = newHeight;
         myState.scale = newHeight / image.height;
         newWidth = myState.scale * image.width;
         myState.canvas.width = newWidth;
@@ -79,6 +78,8 @@ ViewerState.prototype.drawRoute = function(routeDocumentId) {
     routeDoc.get()
       .then(function(doc) {
         routeData = doc.data();
+        document.getElementById('routetitle').innerHTML = routeData.name + ' | V' + routeData.grade;
+        document.getElementById('routesetter').innerHTML = routeData.setter;
         //best way to do this would be to resolve ALL promises for images
         //then clear the route, then draw the holds so there can't be
         //multiple routes up at the same time.
