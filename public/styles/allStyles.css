@@ -27,8 +27,8 @@ html, body {
   margin: 0 auto;
   height: 100%;
   /* These are the dimensions of the wall image*/
-  max-height: 3325px;
-  max-width: 1069px;
+  max-height: 1069px;
+  max-width: calc(100% - 140px);
   overflow: auto;
 }
 
