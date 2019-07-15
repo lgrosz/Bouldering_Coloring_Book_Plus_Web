@@ -46,11 +46,18 @@ html, body {
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
-  left: 0;
   background-color: lightgray; */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
   border-right: solid darkgray 3px;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
 }
 
 .sidenav a {
@@ -69,42 +76,13 @@ html, body {
   color: darkgray;
 }
 
-.sideextra {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: var(--nav-width); /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  right: 0; /* Stay on the right */
-  background-color: lightgray;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 20px;
-  border-left: solid darkgray 3px;
-}
-
-.sideextra a {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: var(--nav-icon-size);
-  color: black;
-  display: block;
-}
-
-.sideextra a.hidden {
+.sidenav a.hidden {
   display: none;
-}
-
-.sideextra a:hover {
-  color: darkgray;
-}
-
-.sideextra a.active {
-  color: darkgray;
 }
 
 .rightsubmenu {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: var(--submenu-width); /* Set the width of the sidebar */
+  width: 0; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -115,11 +93,12 @@ html, body {
   padding-right: 0;
   border-right: solid darkgray 1px;
   border-left: solid darkgray 3px;
+  transition: 0.25s;
 }
 
 .rightsubsubmenu {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: var(--submenu-width); /* Set the width of the sidebar */
+  width: 0; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
@@ -128,6 +107,11 @@ html, body {
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
   padding-right: 0;
+  transition: 0.25s;
+}
+
+.open {
+  width: var(--submenu-width);
   border-right: solid darkgray 1px;
   border-left: solid darkgray 3px;
 }

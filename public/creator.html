@@ -21,7 +21,7 @@
     <div id='wall-div'>
       <canvas id='route-canvas' tabindex='1'></canvas>
     </div>
-    <div class='sidenav'>
+    <div class='sidenav left'>
       <a title='Home' href='index.html'>
         <i class='fa fa-home'></i>
       </a>
@@ -35,11 +35,11 @@
         <i class='fa fa-question'></i>
       </a>
     </div>
-    <div class='sideextra'>
+    <div class='sidenav right'>
       <a title='Edit' id='edit-hold-button' class='hidden' href='javascript:void(0)' onclick='toggleHoldEdit()'><i class='fa fa-edit'></i></a>
       <a title='Save' id='save-route-button' href='javascript:void(0)' onclick='toggleSaveSubmenu()'><i class='fa fa-save'></i></a>
     </div>
-    <div id='editholdsubmenu' class='rightsubmenu hidden'>
+    <div id='editholdsubmenu' class='rightsubmenu'>
       Position: <br />
       x: <input id='ehsm-x' type='number'><br />
       y: <input id='ehsm-y' type='number'><br />
@@ -59,13 +59,13 @@
       </div>
       <button type='button' onclick='applyHoldChanges()'>Apply</button>
     </div>
-    <div id='saveroutesubmenu' class='rightsubmenu hidden'>
+    <div id='saveroutesubmenu' class='rightsubmenu'>
       <input id='save-name' type='text' placeholder='Name'>
       <input id='save-grade' type='text' placeholder='Grade'>
       <input id='save-setter' type='text' placeholder='Setter'>
       <button type='button' onclick='saveRouteToFirestore()'>Save</button>
     </div>
-    <div id='holdbrowser' class='rightsubsubmenu hidden'>
+    <div id='holdbrowser' class='rightsubsubmenu'>
       <!-- Tab links -->
       <div class="tab">
         <button class="tablinks" onclick="openHoldType(event, 'Jugs')">Jugs</button>

@@ -378,13 +378,15 @@ Hold.prototype.contains = function(mx, my, scale) {
 }
 
 function toggleHoldEdit(forceOff=false) {
-  let editHoldsubmenu = document.getElementById('editholdsubmenu');
-  if (!forceOff && editHoldsubmenu.classList.contains('hidden')) {
-    editHoldsubmenu.classList.remove('hidden');
+  let editHoldSubmenu = document.getElementById('editholdsubmenu');
+  if (forceOff) {
+    toggleHoldBrowser(forceOff=true);
+    if (editHoldSubmenu.classList.contains('open')) {
+      editHoldSubmenu.classList.remove('open');
+    }
   }
   else {
-    toggleHoldBrowser(forceOff=true);
-    editHoldsubmenu.classList.add('hidden');
+    editHoldSubmenu.classList.toggle('open');
   }
 }
 
@@ -396,6 +398,7 @@ function fixupEditMenu(selection) {
   document.getElementById('ehsm-sy').value = selection.sy;
   document.getElementById('ehsm-color').value = selection.c;
   document.getElementById('ehsm-path').value = selection.model;
+  updateHoldPreview();
 }
 
 function applyHoldChanges() {
@@ -412,11 +415,13 @@ function applyHoldChanges() {
 
 function toggleSaveSubmenu(forceOff=false) {
   let saveSubmenu = document.getElementById('saveroutesubmenu');
-  if (!forceOff && saveSubmenu.classList.contains('hidden')) {
-    saveSubmenu.classList.remove('hidden');
+  if (forceOff) {
+    if (saveSubmenu.classList.contains('open')) {
+      saveSubmenu.classList.remove('open');
+    }
   }
   else {
-    saveSubmenu.classList.add('hidden');
+    saveSubmenu.classList.toggle('open');
   }
 }
 
@@ -478,12 +483,14 @@ function updateHoldPreview() {
 }
 
 function toggleHoldBrowser(forceOff=false) {
-  let saveSubmenu = document.getElementById('holdbrowser');
-  if (!forceOff && saveSubmenu.classList.contains('hidden')) {
-    saveSubmenu.classList.remove('hidden');
+  let holdBrowser = document.getElementById('holdbrowser');
+  if (forceOff) {
+    if (holdBrowser.classList.contains('open')) {
+      holdBrowser.classList.remove('open');
+    }
   }
   else {
-    saveSubmenu.classList.add('hidden');
+    holdBrowser.classList.toggle('open');
   }
 }
 

@@ -169,10 +169,5 @@ function initRouteBrowser() {
 
 function toggleRouteBrowser() {
   let browserDiv = document.getElementById('route-browser')
-  if (browserDiv.classList.contains('hidden')){
-    browserDiv.classList.remove('hidden');
-  }
-  else {
-    browserDiv.classList.add('hidden');
-  }
+  browserDiv.classList.toggle('open');
 }
