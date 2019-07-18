@@ -72,6 +72,14 @@ function CreatorState(canvas) {
   // {"path": image}
   this.backgroundImage = assets['walls/sdsmt/all.png'];
 
+  //some meta data for the current route
+  this.name = null;
+  this.grade = null;
+  this.setter = null;
+  this.description = null;
+  this.editKey = null;
+  this.tags = [];
+
   // keep track of the state of the canvas
   this.valid = false; //if false, canvas needs to redraw
   this.holds = []; // keeps hold data
@@ -111,7 +119,7 @@ function CreatorState(canvas) {
       }
       myState.selection = null;
       editHoldButton.classList.add('hidden');
-      toggleHoldEdit(forceOff=true);
+      toggleMenu('editholdsubmenu',forceOff=true);
       myState.valid = false;
     }
   });
@@ -204,7 +212,7 @@ CreatorState.prototype.deleteHold = function() {
       myState.selection = null;
       let editHoldButton = document.getElementById('edit-hold-button');
       editHoldButton.classList.add('hidden');
-      toggleHoldEdit(forceOff=true);
+      toggleMenu('editholdsubmenu' ,forceOff=true);
       return;
     }
   }
@@ -339,7 +347,7 @@ function Hold(x, y, r, s) {
 
 // Draws this shape to a given context
 Hold.prototype.draw = function(ctx, scale) {
-  let {x, y, r, sx, sy, c} = this;
+  let {x, y, r, sx, sy, f, c} = this;
   let image = assets[this.model];
 
   // the width and height depend on the image and scale
@@ -349,14 +357,18 @@ Hold.prototype.draw = function(ctx, scale) {
   this.h = h;
 
   //so we don't taint the canvas
+  let reflect = true;
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(r * Math.PI / 180);
+  if (f) {
+    ctx.scale(-1, 1);
+  }
   ctx.drawImage(image, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
   ctx.beginPath();
-  ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
-  ctx.fillStyle = '#' + c;
-  ctx.fill();
+  //ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
+  //ctx.fillStyle = '#' + c;
+  //ctx.fill();
   //recolor
   //let red = parseInt(c.substring(0, 2), 16);
   //let blue = parseInt(c.substring(2, 4), 16);
@@ -375,19 +387,6 @@ Hold.prototype.contains = function(mx, my, scale) {
   inXBounds = (mx > this.x - this.w/2*scale) && (mx < this.x + this.w/2*scale)
   inYBounds = (my > this.y - this.h/2*scale) && (my < this.y + this.h/2*scale)
   return (inXBounds && inYBounds);
-}
-
-function toggleHoldEdit(forceOff=false) {
-  let editHoldSubmenu = document.getElementById('editholdsubmenu');
-  if (forceOff) {
-    toggleHoldBrowser(forceOff=true);
-    if (editHoldSubmenu.classList.contains('open')) {
-      editHoldSubmenu.classList.remove('open');
-    }
-  }
-  else {
-    editHoldSubmenu.classList.toggle('open');
-  }
 }
 
 function fixupEditMenu(selection) {
@@ -413,25 +412,17 @@ function applyHoldChanges() {
   myState.valid = false;
 }
 
-function toggleSaveSubmenu(forceOff=false) {
-  let saveSubmenu = document.getElementById('saveroutesubmenu');
-  if (forceOff) {
-    if (saveSubmenu.classList.contains('open')) {
-      saveSubmenu.classList.remove('open');
-    }
-  }
-  else {
-    saveSubmenu.classList.toggle('open');
-  }
-}
-
 function saveRouteToFirestore() {
   //retrieve name, grade, and setter fields
-  let name = document.getElementById('save-name').value;
-  let grade = document.getElementById('save-grade').value;
-  let setter = document.getElementById('save-setter').value;
-  //if any are empty, throw error to screen
-  //create data to save
+  let name = myState.name;
+  let grade = myState.grade;
+  let setter = myState.setter;
+  let desc = myState.description;
+  let tags = myState.tags;
+  let editKey = myState.editKey;
+
+  //check if stuff required feilds are set
+
   let route = {};
   let holds = [];
   for (let i = 0; i < myState.holds.length; i++) {
@@ -449,7 +440,10 @@ function saveRouteToFirestore() {
   route['name'] = name;
   route['grade'] = grade;
   route['setter'] = setter;
-  route['holds'] = holds
+  route['holds'] = holds;
+  route['description'] = desc;
+  route['tags'] = tags;
+  route['holdKey'] = editKey;
   //if route already exists, throw error to screen
   //else save route to fs
   const db = firebase.firestore();
@@ -482,18 +476,6 @@ function updateHoldPreview() {
   previewImage.src = assets[selection].src;
 }
 
-function toggleHoldBrowser(forceOff=false) {
-  let holdBrowser = document.getElementById('holdbrowser');
-  if (forceOff) {
-    if (holdBrowser.classList.contains('open')) {
-      holdBrowser.classList.remove('open');
-    }
-  }
-  else {
-    holdBrowser.classList.toggle('open');
-  }
-}
-
 //////////////
 function openHoldType(evt, holdType) {
   // Declare all variables
@@ -515,7 +497,8 @@ function openHoldType(evt, holdType) {
   document.getElementById(holdType).style.display = 'block';
   evt.currentTarget.className += ' active';
 }
-///////////////
+////////////////
+
 function populateHoldBrowser() {
   //this is kind of hacky, especially with the string work
   //this should be changed later TODO
@@ -538,4 +521,56 @@ function populateHoldBrowser() {
       }
     }
   }
+}
+
+function applyMetadata() {
+  myState.name = document.getElementById('meta-name').value;
+  myState.grade = document.getElementById('meta-grade').value;
+  myState.setter = document.getElementById('meta-setter').value;
+  myState.description = document.getElementById('meta-desc').value;
+  myState.editKey = document.getElementById('meta-key').value;
+}
+
+function toggleMenu(menuId, forceOff=false) {
+  let menuDiv = document.getElementById(menuId);
+  if (forceOff) {
+    menuDiv.classList.remove('open');
+  }
+  else {
+    menuDiv.classList.toggle('open');
+  }
+  //close all submenus (not working becaues they're not actually children)
+  if (!menuDiv.classList.contains('open')) {
+    let children = menuDiv.children;
+    for(let i = 0; i < children.length; i++) {
+      let child = children[i];
+      if (child.classList.contains('submenu')) {
+        toggleMenu(child.id, true);
+      }
+    }
+  }
+}
+
+function addTagFromMetaMenu() {
+  let tag = document.getElementById('meta-add-tag').value.toLowerCase()
+  if (tag != '') {
+    if (myState.tags.indexOf(tag) === -1) {
+      myState.tags.push(tag);
+      addTagToTagDisplay(tag);
+    }
+  }
+}
+
+function addTagToTagDisplay(tag) {
+  let tagList = document.getElementById('taglist');
+  let tagItem = document.createElement('li');
+  tagItem.innerHTML = tag + ' | x' ;
+  tagItem.setAttribute('data-tagString', tag);
+  tagItem.addEventListener('click', function () {
+    let tagString = this.getAttribute('data-tagString');
+    indexToRemove = myState.tags.indexOf(tagString)
+    myState.tags.splice(indexToRemove, 1);
+    this.remove();
+  });
+  tagList.appendChild(tagItem);
 }
