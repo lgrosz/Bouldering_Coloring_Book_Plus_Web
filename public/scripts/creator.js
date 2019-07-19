@@ -1,58 +1,32 @@
-document.addEventListener('DOMContentLoaded', event => {
-  try {
-    const app = firebase.app();
-    console.log('Firebase was loaded');
-  } catch (e) {
-    console.error(e)
-  }
+document.addEventListener('DOMContentLoaded', onload)
 
-  loadImportantAssets()
-    .then(assetsObject => {
-      //GLOBAL (ugly but it'll do for now)
-      assets = assetsObject
-      populateHoldBrowser();
-      init();
-    });
-});
+async function onload() {
+  assets = await loadAssets();
+  populateHoldBrowser();
+  init();
+}
 
-function loadImportantAssets() {
-  //TODO move this somewhere else
-  editMenuModelSelect = document.getElementById('ehsm-path');
-  imagesPromise = new Promise(function(resolve, reject) {
-    imagesObject = {};
-    pathArray = [];
-    imagesPromiseArray = [];
-    // get all hold image paths from firestore 
-    const db = firebase.firestore();
-    db.collection('asset-paths')
-      .get()
-      .then(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          // create promise array for images
-          // create a parallel path array
-          let holdData = doc.data();
-          let path = holdData.path;
-          //TODO move this somewhere else
-          if (path.includes('holds')) {
-            let option = document.createElement('option');
-            option.text = path;
-            editMenuModelSelect.add(option);
-          }
-          imagesPromiseArray.push(loadImage(path));
-          pathArray.push(path);
-        });
-        Promise.all(imagesPromiseArray)
-          .then(imagesArray => {
-            // when all images resolve, map the two parallel
-            // arrays together
-            pathArray.forEach(function(key, index) {
-              imagesObject[key] = imagesArray[index];
-            });
-            resolve(imagesObject);
-          });
+async function loadAssets() {
+  let imagePathToElMap = {};
+  // get all hold image paths from firestore 
+  const db = firebase.firestore();
+  await db.collection('asset-paths')
+    .get()
+    .then(async(querySnapshot) => {
+      // make array of asset paths
+      let imagePaths = [];
+      querySnapshot.forEach(doc => {
+        let holdData = doc.data();
+        let path = holdData.path;
+        imagePaths.push(path);
       });
-  });
-  return imagesPromise;
+      const imageUrls = await Promise.all(imagePaths.map(path => getFirebaseStorageUrl(path)));
+      const imageEls = await Promise.all(imageUrls.map(url => loadImage(url)));
+      imagePaths.forEach(function(key, index) {
+        imagePathToElMap[key] = imageEls[index];
+      });
+    });
+  return imagePathToElMap;
 }
 
 
@@ -343,6 +317,7 @@ function Hold(x, y, r, s) {
   this.sy = s; // scale
   this.r = r; // rotation
   this.c = '000000' // color
+  this.f = false; // flip
 }
 
 // Draws this shape to a given context
@@ -448,25 +423,27 @@ function saveRouteToFirestore() {
   //else save route to fs
   const db = firebase.firestore();
   db.collection('routes').add(route)
-    .then(function() {
+    .then(() => {
       console.log('Document successfully written!');
     })
-    .catch(function() {
+    .catch(() => {
       console.log('Error writing document.')
     });
 }
 
-function loadImage(path) {
+async function getFirebaseStorageUrl(path) {
+  const storage = firebase.storage();
+  const storageRef = storage.ref().child(path);
+  let url = await storageRef.getDownloadURL();
+  return url;
+}
+
+function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.addEventListener("load", () => resolve(img));
     img.addEventListener("error", err => reject(err));
-    // get image from firebase storage
-    const storage = firebase.storage();
-    const storageRef = storage.ref().child(path);
-    storageRef.getDownloadURL().then( url => {
-      img.src = url;
-    });
+    img.src = src;
   });
 }
 
@@ -505,16 +482,25 @@ function populateHoldBrowser() {
   //maybe not using assets for this and have a hold
   //collection in firebase in addition to the assets
   const entries = Object.entries(assets);
+  editMenuModelSelect = document.getElementById('ehsm-path');
   for (const [path, img] of entries) {
     if (path.includes('holds')) {
+      //add the option to the select element
+      let option = document.createElement('option');
+      option.text = path;
+      editMenuModelSelect.add(option);
+      //get typestring
       let idx1 = path.indexOf('/') + 1;
       let idx2 = path.lastIndexOf('/');
       let typestr = path.substr(idx1, idx2 - idx1);
       if (typestr.length > 0) {
+        //add image to correct list
         let par = document.getElementById(typestr + 'list');
         let imgchild = par.appendChild(img);
+        //on click the selection option should change and
+        //the previous should be updated
         imgchild.addEventListener('click', function(){ 
-          let selectionEl = document.getElementById('ehsm-path');
+          let selectionEl = editMenuModelSelect;
           selectionEl.value = path;
           updateHoldPreview();
         });

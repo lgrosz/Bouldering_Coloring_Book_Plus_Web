@@ -22,6 +22,7 @@
       <canvas id='route-canvas'></canvas>
       <h1 id='routetitle'></h1>
       <h2 id='routesetter'></h2>
+      <p id='routedesc'></p>
     </div>
     <div class='sidenav left'>
       <a title='Home' href='index.html'>
@@ -38,11 +39,14 @@
       </a>
     </div>
     <div class='sidenav right'>
-      <a href='javascript:void(0)' class='opensubmenu' onclick='toggleRouteBrowser()'>
+      <a href='javascript:void(0)' class='opensubmenu' onclick='toggleMenu("route-browser")'>
         <i class='fa fa-list'></i>
       </a>
+      <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
+        <i class='fa fa-pencil'></i>
+      </a>
     </div>
-    <div id='route-browser' class='rightsubmenu'>
+    <div id='route-browser' class='submenu right0'>
       <input type='text' placeholder='Search...'>
       <a href='javascript:void(0)' onclick='filterRoutes()'>
         <i class='fa fa-filter'></i>

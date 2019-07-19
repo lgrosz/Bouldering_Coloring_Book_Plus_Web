@@ -80,6 +80,7 @@ ViewerState.prototype.drawRoute = function(routeDocumentId) {
         routeData = doc.data();
         document.getElementById('routetitle').innerHTML = routeData.name + ' | V' + routeData.grade;
         document.getElementById('routesetter').innerHTML = routeData.setter;
+        document.getElementById('routedesc').innerHTML = routeData.description;
         //best way to do this would be to resolve ALL promises for images
         //then clear the route, then draw the holds so there can't be
         //multiple routes up at the same time.
@@ -167,7 +168,22 @@ function initRouteBrowser() {
     });
 }
 
-function toggleRouteBrowser() {
-  let browserDiv = document.getElementById('route-browser')
-  browserDiv.classList.toggle('open');
+function toggleMenu(menuId, forceOff=false) {
+  let menuDiv = document.getElementById(menuId);
+  if (forceOff) {
+    menuDiv.classList.remove('open');
+  }
+  else {
+    menuDiv.classList.toggle('open');
+  }
+  //close all submenus (not working becaues they're not actually children)
+  if (!menuDiv.classList.contains('open')) {
+    let children = menuDiv.children;
+    for(let i = 0; i < children.length; i++) {
+      let child = children[i];
+      if (child.classList.contains('submenu')) {
+        toggleMenu(child.id, true);
+      }
+    }
+  }
 }
