@@ -105,7 +105,7 @@ ViewerState.prototype.drawRoute = function(routeDocumentId) {
 ViewerState.prototype.drawHold = function(holdData, image) {
   let ctx = this.ctx;
   let scale = this.scale;
-  let {x, y, r, sx, sy, c} = holdData;
+  let {x, y, r, f, sx, sy, c} = holdData;
   x = x * scale;
   y = y * scale;
   let w = image.width
@@ -113,11 +113,14 @@ ViewerState.prototype.drawHold = function(holdData, image) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(r * Math.PI / 180);
+  if (f) {
+    ctx.scale(-1, 1);
+  }
   ctx.drawImage(image, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
-  ctx.beginPath();
-  ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
-  ctx.fillStyle = '#' + c;
-  ctx.fill();
+  //ctx.beginPath();
+  //ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
+  //ctx.fillStyle = '#' + c;
+  //ctx.fill();
   ctx.restore();
 }
 
@@ -186,4 +189,9 @@ function toggleMenu(menuId, forceOff=false) {
       }
     }
   }
+}
+
+function editCurrentRoute() {
+  let promptString = 'Enter the edit key for this route.';
+  let key = prompt(promptString, 'key');
 }

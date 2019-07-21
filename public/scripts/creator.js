@@ -340,7 +340,7 @@ Hold.prototype.draw = function(ctx, scale) {
     ctx.scale(-1, 1);
   }
   ctx.drawImage(image, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
-  ctx.beginPath();
+  //ctx.beginPath();
   //ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
   //ctx.fillStyle = '#' + c;
   //ctx.fill();
@@ -368,6 +368,7 @@ function fixupEditMenu(selection) {
   document.getElementById('ehsm-x').value = selection.x;
   document.getElementById('ehsm-y').value = selection.y;
   document.getElementById('ehsm-r').value = selection.r;
+  document.getElementById('ehsm-f').checked = selection.f;
   document.getElementById('ehsm-sx').value = selection.sx;
   document.getElementById('ehsm-sy').value = selection.sy;
   document.getElementById('ehsm-color').value = selection.c;
@@ -379,6 +380,7 @@ function applyHoldChanges() {
   myState.selection.x = parseInt(document.getElementById('ehsm-x').value);
   myState.selection.y = parseInt(document.getElementById('ehsm-y').value);
   myState.selection.r = parseInt(document.getElementById('ehsm-r').value);
+  myState.selection.f = document.getElementById('ehsm-f').checked;
   myState.selection.sx = parseFloat(document.getElementById('ehsm-sx').value);
   myState.selection.sy = parseFloat(document.getElementById('ehsm-sy').value);
   myState.selection.model = document.getElementById('ehsm-path').value;
@@ -388,6 +390,7 @@ function applyHoldChanges() {
 }
 
 function saveRouteToFirestore() {
+  console.log('Saving route...');
   //retrieve name, grade, and setter fields
   let name = myState.name;
   let grade = myState.grade;
@@ -395,9 +398,9 @@ function saveRouteToFirestore() {
   let desc = myState.description;
   let tags = myState.tags;
   let editKey = myState.editKey;
-
   //check if stuff required feilds are set
 
+  // set route attributes
   let route = {};
   let holds = [];
   for (let i = 0; i < myState.holds.length; i++) {
@@ -405,6 +408,7 @@ function saveRouteToFirestore() {
     let hold = {};
     hold['x'] = holdState.x / myState.scale;
     hold['y'] = holdState.y / myState.scale;
+    hold['f'] = holdState.f;
     hold['r'] = holdState.r;
     hold['c'] = holdState.c;
     hold['sx'] = holdState.sx;
@@ -419,8 +423,7 @@ function saveRouteToFirestore() {
   route['description'] = desc;
   route['tags'] = tags;
   route['holdKey'] = editKey;
-  //if route already exists, throw error to screen
-  //else save route to fs
+  // save route
   const db = firebase.firestore();
   db.collection('routes').add(route)
     .then(() => {
