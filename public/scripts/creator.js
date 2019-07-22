@@ -1,46 +1,107 @@
 document.addEventListener('DOMContentLoaded', onload)
 
 async function onload() {
+  // initialize canvas state, globals
   assets = await loadAssets();
+  myState = new CreatorState(document.getElementById('route-canvas'));
+
+  // deal with url parameters
+  let params = getUrlParams();
+  if (params['id'] != undefined) {
+    await loadRoute(params['id']);
+    myState.valid = false;
+  }
+  if (params['key'] != undefined) {
+    let id = params['id'];
+    let key = params['key'];
+    myState.keyAccepted = await isMatchingKey(id, key);
+  }
+
   populateHoldBrowser();
-  init();
 }
 
-function init(imagesObject) {
-  wall = new CreatorState(document.getElementById('route-canvas'));
+async function isMatchingKey(id, key) {
+  db = firebase.firestore();
+  let routesRef = db.collection('routes');
+  let keyAccepted = false;
+  await routesRef.doc(id)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let route = doc.data();
+        if (route.editKey == key) {
+          keyAccepted = true;
+        }
+      }
+      else {
+        console.log('Could not find route id:', id);
+      }
+    });
+
+  //returning
+  if (keyAccepted) {
+    console.log('Key matches');
+    return true;
+  }
+  else {
+    console.log('Key does not match, route will not be overwritten.');
+    return false;
+  }
+}
+
+// load route from routeid
+async function loadRoute(id) {
+  console.log('Loading route id:', id);
+  db = firebase.firestore();
+  let routesRef = db.collection('routes');
+  let route = null;
+  await routesRef.doc(id)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        route = doc.data();
+      }
+      else {
+        console.log('Could not find route id:', id);
+      }
+    });
+  if (route != null) {
+    myState.routeId = id;
+    myState.route = route;
+    myState.resetWall();
+    console.log('Successfully loaded route.');
+  }
 }
 
 function CreatorState(canvas) {
   // setup canvas dimensions
   this.div = document.getElementById('wall-div');
   this.canvas = canvas;
-  //we will find this out once we draw, or we can hardcode it...
+
+  // route specifics
+  this.route = {
+    'name': null,
+    'description': null,
+    'grade': null,
+    'setter': null,
+    'holds': [],
+    'editKey': null,
+    'tags': [],
+  };
+  this.routeId = null;
+  this.keyAccepted = false;
+
+  // visual only
   this.scale = null; 
   this.ctx = canvas.getContext('2d');
-
-  // image storage
-  // {"path": image}
   this.backgroundImage = assets['walls/sdsmt/all.png'];
-
-  //some meta data for the current route
-  this.name = null;
-  this.grade = null;
-  this.setter = null;
-  this.description = null;
-  this.editKey = null;
-  this.tags = [];
 
   // keep track of the state of the canvas
   this.valid = false; //if false, canvas needs to redraw
-  this.holds = []; // keeps hold data
   this.dragging = false; // true when user is dragging
   this.selection = null; // the selected hold
   this.dragoffx = 0; // drag offsets
   this.dragoffy = 0;
-
-  // in event listeners, `this` means the canvas, so we'll need some other
-  // variable to access the CreatorState object.
-  myState = this;
 
   // remove text selection double click behavior
   canvas.addEventListener('selectstart', function(e) {
@@ -52,12 +113,13 @@ function CreatorState(canvas) {
   canvas.addEventListener('mousedown', function(e) {
     let editHoldButton = document.getElementById('edit-hold-button');
     let mouse = myState.getMouse(e);
-    let mx = mouse.x;
-    let my = mouse.y;
-    let holds = myState.holds;
+    let scale = myState.scale;
+    let mx = mouse.x / scale;
+    let my = mouse.y / scale;
+    let holds = myState.route.holds;
     let l = holds.length;
     for (let i = l-1; i >= 0; i--) {
-      if (holds[i].contains(mx, my, myState.scale)) {
+      if (contains(holds[i], mx, my)) {
         let mySel = holds[i];
         myState.dragoffx = mx - mySel.x;
         myState.dragoffy = my - mySel.y;
@@ -78,8 +140,11 @@ function CreatorState(canvas) {
   canvas.addEventListener('mousemove', function(e) {
     if (myState.dragging) {
       let mouse = myState.getMouse(e);
-      myState.selection.x = mouse.x - myState.dragoffx;
-      myState.selection.y = mouse.y - myState.dragoffy;   
+      let scale = myState.scale;
+      let mx = mouse.x / scale;
+      let my = mouse.y / scale;
+      myState.selection.x = mx - myState.dragoffx;
+      myState.selection.y = my - myState.dragoffy;   
       myState.valid = false;
     }
   }, true);
@@ -92,7 +157,18 @@ function CreatorState(canvas) {
   // double click for adding holds
   canvas.addEventListener('dblclick', function(e) {
     let mouse = myState.getMouse(e);
-    myState.addHold(new Hold(mouse.x, mouse.y, 0, 1));
+    let scale = myState.scale;
+    let hold = {
+      'x': mouse.x / scale,
+      'y': mouse.y / scale,
+      'r': 0,
+      'f': false,
+      'sx': 1,
+      'sy': 1,
+      'c': '000000',
+      'model': 'holds/sample-hold.png'
+    };
+    myState.addHold(hold);
   }, true);
 
   //event listeners for keypresses
@@ -140,12 +216,14 @@ function CreatorState(canvas) {
   });
   
   // refreshing
+  let myState = this;
   this.interval = 30;
   setInterval(function() { myState.draw(); }, myState.interval);
 }
 
 CreatorState.prototype.addHold = function(hold) {
-  this.holds.push(hold);
+  this.route.holds.push(hold);
+  console.log(this.route.holds);
   this.valid = false;
 }
 
@@ -245,7 +323,7 @@ CreatorState.prototype.draw = function() {
   // if our state is invalid, redraw
   if (!this.valid) {
     let ctx = this.ctx;
-    let holds = this.holds;
+    let holds = this.route.holds;
     
     this.resetWall();
     
@@ -253,18 +331,23 @@ CreatorState.prototype.draw = function() {
     let l = holds.length;
     for (let i = 0; i < l; i++) {
       let hold = holds[i];
-      holds[i].draw(ctx, myState.scale);
+      drawHold(ctx, hold);
     }
     
     // do selection specific modifications
     if (this.selection != null) {
       fixupEditMenu(this.selection);
-      let {x, y, w, h, r, sx, sy} = this.selection;
-      let scale = this.scale;
+      let {x, y, r, sx, sy, model} = this.selection;
+      let image = assets[model]
+      let scale = myState.scale;
+      x = x * scale;
+      y = y * scale;
+      let w = image.width * scale;
+      let h = image.height * scale;
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(r * Math.PI / 180);
-      ctx.strokeRect(-w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
+      ctx.strokeRect(-w/2*sx, -h/2*sy, w*sx, h*sy);
       ctx.restore();
     }
     this.valid = true;
@@ -279,64 +362,42 @@ CreatorState.prototype.getMouse = function(e) {
     };
 }
 
-function Hold(x, y, r, s) {
-  // get the model associated with this hold
-  this.model = 'holds/sample-hold.png'
-
-  //closure
-  myHold = this;
-
-  // positional info is stored plainly
-  this.x = x; // x pos
-  this.y = y; // y pos
-  this.sx = s; // scale
-  this.sy = s; // scale
-  this.r = r; // rotation
-  this.c = '000000' // color
-  this.f = false; // flip
-}
-
 // Draws this shape to a given context
-Hold.prototype.draw = function(ctx, scale) {
-  let {x, y, r, sx, sy, f, c} = this;
-  let image = assets[this.model];
-
-  // the width and height depend on the image and scale
+function drawHold(ctx, hold) {
+  // get variables
+  let {x, y, r, sx, sy, f, c, model} = hold;
+  let image = assets[model];
+  let scale = myState.scale;
   let w = image.width;
   let h = image.height;
-  this.w = w;
-  this.h = h;
+  x = x * scale;
+  y = y * scale;
 
-  //so we don't taint the canvas
-  let reflect = true;
+  // draw the image in position
   ctx.save();
-  ctx.translate(x, y);
+  ctx.translate(x ,y);
   ctx.rotate(r * Math.PI / 180);
   if (f) {
     ctx.scale(-1, 1);
   }
   ctx.drawImage(image, -w/2*sx*scale, -h/2*sy*scale, w*sx*scale, h*sy*scale);
-  //ctx.beginPath();
-  //ctx.ellipse(0, 0, w/8*sx*scale, h/8*sy*scale, 0, 0, 2*Math.PI);
-  //ctx.fillStyle = '#' + c;
-  //ctx.fill();
-  //recolor
-  //let red = parseInt(c.substring(0, 2), 16);
-  //let blue = parseInt(c.substring(2, 4), 16);
-  //let green = parseInt(c.substring(4, 6), 16);
-  // not working because of some cors permissions... How do I do this when I
-  // get images from firebase storage?!
-  //let myImageData = tempctx.getImageData(0, 0, 50, 50);
-      //recolor pixel
-  //ctx.putImageData(myImageData, 0, 0);
   ctx.restore();
 }
 
 // Determine if a point is inside the shape's bounds
-Hold.prototype.contains = function(mx, my, scale) {
-  // TODO this should change based on rotation of the hold
-  inXBounds = (mx > this.x - this.w/2*scale) && (mx < this.x + this.w/2*scale)
-  inYBounds = (my > this.y - this.h/2*scale) && (my < this.y + this.h/2*scale)
+function contains(hold, mx, my) {
+  let image = assets[hold.model];
+
+  let halfWidth = image.width / 2;
+  let leftBound = hold.x - halfWidth;
+  let rightBound = hold.x + halfWidth;
+  let inXBounds = (mx > leftBound) && (mx < rightBound);
+
+  let halfHeight = image.height / 2;
+  let topBound = hold.y - halfHeight;
+  let bottomBound = hold.y + halfHeight;
+  let inYBounds = (my > topBound) && (my < bottomBound);
+
   return (inXBounds && inYBounds);
 }
 
@@ -367,39 +428,9 @@ function applyHoldChanges() {
 
 function saveRouteToFirestore() {
   console.log('Saving route...');
-  //retrieve name, grade, and setter fields
-  let name = myState.name;
-  let grade = myState.grade;
-  let setter = myState.setter;
-  let desc = myState.description;
-  let tags = myState.tags;
-  let editKey = myState.editKey;
-  //check if stuff required feilds are set
+  let route = myState.route;
+  // should do check here
 
-  // set route attributes
-  let route = {};
-  let holds = [];
-  for (let i = 0; i < myState.holds.length; i++) {
-    let holdState = myState.holds[i];
-    let hold = {};
-    hold['x'] = holdState.x / myState.scale;
-    hold['y'] = holdState.y / myState.scale;
-    hold['f'] = holdState.f;
-    hold['r'] = holdState.r;
-    hold['c'] = holdState.c;
-    hold['sx'] = holdState.sx;
-    hold['sy'] = holdState.sy;
-    hold['model'] = holdState.model;
-    holds.push(hold);
-  }
-  route['name'] = name;
-  route['grade'] = grade;
-  route['setter'] = setter;
-  route['holds'] = holds;
-  route['description'] = desc;
-  route['tags'] = tags;
-  route['holdKey'] = editKey;
-  // save route
   const db = firebase.firestore();
   db.collection('routes').add(route)
     .then(() => {
@@ -413,7 +444,7 @@ function saveRouteToFirestore() {
 function updateHoldPreview() {
   let previewImage = document.getElementById('hold-preview');
   let selection = document.getElementById('ehsm-path').value;
-  previewImage.src = assets[selection].src;
+  previewImage.src = assets[selection.model];
 }
 
 //////////////
@@ -473,17 +504,19 @@ function populateHoldBrowser() {
 }
 
 function applyMetadata() {
-  myState.name = document.getElementById('meta-name').value;
-  myState.grade = document.getElementById('meta-grade').value;
-  myState.setter = document.getElementById('meta-setter').value;
-  myState.description = document.getElementById('meta-desc').value;
-  myState.editKey = document.getElementById('meta-key').value;
+  let route = myState.route;
+  route.name = document.getElementById('meta-name').value;
+  route.grade = document.getElementById('meta-grade').value;
+  route.setter = document.getElementById('meta-setter').value;
+  route.description = document.getElementById('meta-desc').value;
+  route.editKey = document.getElementById('meta-key').value;
 }
 
 function addTagFromMetaMenu() {
   let tag = document.getElementById('meta-add-tag').value.toLowerCase()
+  let tags = myState.route.tags;
   if (tag != '') {
-    if (myState.tags.indexOf(tag) === -1) {
+    if (tags.indexOf(tag) === -1) {
       myState.tags.push(tag);
       addTagToTagDisplay(tag);
     }
@@ -503,3 +536,4 @@ function addTagToTagDisplay(tag) {
   });
   tagList.appendChild(tagItem);
 }
+

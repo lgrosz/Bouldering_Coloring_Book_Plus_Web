@@ -5,14 +5,16 @@ async function onload() {
   assets = await loadAssets();
   myState = new ViewerState(document.getElementById('route-canvas'));
 
-  // deal with url requests
+  // deal with url parameters
   let params = getUrlParams();
   if (params['id'] != undefined) {
     loadRoute(params['id']);
   }
+
   populateRouteBrowser();
 }
 
+// load route from routeid
 async function loadRoute(id) {
   console.log('Loading route id:', id);
   db = firebase.firestore();
@@ -40,10 +42,10 @@ function ViewerState(canvas) {
   // setup canvas dimensions
   this.div = document.getElementById('wall-div');
   this.canvas = canvas;
+
   // route specifics
   this.route = null;
   this.routeId = null;
-  this.holds = [];
 
   // visual only
   this.scale = null;
@@ -145,5 +147,7 @@ function populateRouteBrowser() {
 function editCurrentRoute() {
   let promptString = 'Enter the edit key for this route.';
   let key = prompt(promptString, 'key');
+  let parameters = '?id=' + myState.routeId + '&key=' + key;
+  window.location.href = 'creator.html' + parameters;
 }
 
