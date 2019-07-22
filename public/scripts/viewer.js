@@ -1,37 +1,57 @@
-document.addEventListener('DOMContentLoaded', event => {
-  // load firebase app
-  try {
-    const app = firebase.app();
-    console.log('Firebase was loaded');
-  } catch (e) {
-    console.error(e)
-    document.getElementById('load-firebase').innerHTML = 'Firebase load was unsuccessful, see console';
-  }
-  init();
-});
+document.addEventListener('DOMContentLoaded', onload)
 
-function init() {
-  wall = new ViewerState(document.getElementById('route-canvas'));
-  wall.drawBackground();
-  initRouteBrowser();
-  document.getElementById('routetitle').innerHTML = 'Select route in browser';
-  document.getElementById('routesetter').innerHTML = '(to the left)';
+async function onload() {
+  //initialize canvas state, globals
+  assets = await loadAssets();
+  myState = new ViewerState(document.getElementById('route-canvas'));
+
+  // deal with url requests
+  let params = getUrlParams();
+  if (params['id'] != undefined) {
+    loadRoute(params['id']);
+  }
+  populateRouteBrowser();
+}
+
+async function loadRoute(id) {
+  console.log('Loading route id:', id);
+  db = firebase.firestore();
+  let routesRef = db.collection('routes');
+  let route = null;
+  await routesRef.doc(id)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        route = doc.data();
+      }
+      else {
+        console.log('Could not find route id:', id);
+      }
+    });
+  if (route != null) {
+    myState.routeId = id;
+    myState.route = route;
+    myState.resetWall();
+    console.log('Successfully loaded route.');
+  }
 }
 
 function ViewerState(canvas) {
   // setup canvas dimensions
   this.div = document.getElementById('wall-div');
   this.canvas = canvas;
-  //we will find this out once we draw or we can hardcode it
-  this.scale = null;
+  // route specifics
+  this.route = null;
+  this.routeId = null;
   this.holds = [];
+
+  // visual only
+  this.scale = null;
+  this.backgroundImage = assets['walls/sdsmt/all.png'];
   this.ctx = canvas.getContext('2d');
-  this.backgroundImage = null;
 
-  // have to be able to access the object in eventListeners
-  // when I have them that is
-  myState = this;
-
+  // initialization
+  this.drawBackground();
 }
 
 ViewerState.prototype.clear = function() {
@@ -40,71 +60,37 @@ ViewerState.prototype.clear = function() {
 
 ViewerState.prototype.drawBackground = function() {
   let ctx = this.ctx;
-  let myState = this;
 
-  if (this.backgroundImage === null) {
-    loadImage('walls/sdsmt/all.png')
-      .then(image => {
-        newHeight = myState.div.clientHeight - 200;
-        myState.canvas.height = newHeight;
-        myState.scale = newHeight / image.height;
-        newWidth = myState.scale * image.width;
-        myState.canvas.width = newWidth;
-        myState.width = newWidth;
-        myState.height = newHeight;
-        ctx.drawImage(image, 0, 0, newWidth, newHeight);
-        myState.backgroundImage = image;
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-  else {
-    ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
-  }
+  this.canvas.height = this.div.clientHeight;
+  this.height = this.canvas.clientHeight;
+  this.scale = this.height / this.backgroundImage.height;
+  this.width = this.scale * this.backgroundImage.width;
+  this.canvas.width = this.width;
+  ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
 }
 
 ViewerState.prototype.resetWall = function() {
   this.clear();
   this.drawBackground();
+  this.drawRoute();
 }
 
-ViewerState.prototype.drawRoute = function(routeDocumentId) {
-  const db = firebase.firestore();
-  let myState = this;
-  routeDoc = db.collection('routes').doc(routeDocumentId);
-  if (routeDoc != null) {
-    this.resetWall();
-    routeDoc.get()
-      .then(function(doc) {
-        routeData = doc.data();
-        document.getElementById('routetitle').innerHTML = routeData.name + ' | V' + routeData.grade;
-        document.getElementById('routesetter').innerHTML = routeData.setter;
-        document.getElementById('routedesc').innerHTML = routeData.description;
-        //best way to do this would be to resolve ALL promises for images
-        //then clear the route, then draw the holds so there can't be
-        //multiple routes up at the same time.
-        //problem: how do I associate the promise array with specific
-        //holds on the route?
-        routeData.holds.forEach(holdData => {
-          loadImage(holdData.model)
-            .then(image => {
-              myState.drawHold(holdData, image);
-            })
-            .catch(err => {
-              console.error(err);
-            });
-        });
-      })
-      .catch(function(error) {
-        console.log('Error getting document:', error);
-      });
+ViewerState.prototype.drawRoute = function() {
+  let route = this.route;
+  let holds = route.holds;
+  for (hold of holds) {
+    this.drawHold(hold);
   }
+  // meta data
+  document.getElementById('routetitle').innerHTML = route.name + ' | V' + route.grade;
+  document.getElementById('routesetter').innerHTML = route.setter;
+  document.getElementById('routedesc').innerHTML = route.description;
 }
 
-ViewerState.prototype.drawHold = function(holdData, image) {
+ViewerState.prototype.drawHold = function(holdData) {
   let ctx = this.ctx;
   let scale = this.scale;
+  let image = assets[holdData.model];
   let {x, y, r, f, sx, sy, c} = holdData;
   x = x * scale;
   y = y * scale;
@@ -124,22 +110,8 @@ ViewerState.prototype.drawHold = function(holdData, image) {
   ctx.restore();
 }
 
-function loadImage(path) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.addEventListener("load", () => resolve(img));
-    img.addEventListener("error", err => reject(err));
-    // get image from firebase storage
-    const storage = firebase.storage();
-    const storageRef = storage.ref().child(path);
-    storageRef.getDownloadURL().then( url => {
-      img.src = url;
-    });
-  });
-}
-
 /////////////////////////////////////
-function initRouteBrowser() {
+function populateRouteBrowser() {
 
   let routeButtonGroup = document.getElementById('route-button-group');
 
@@ -160,8 +132,7 @@ function initRouteBrowser() {
                            + ' | V' + routeData.grade
                            + '<br />' + setterString;
         button.onclick = function () {
-          myState.drawRoute(doc.id);
-          console.log(doc.id);
+          loadRoute(doc.id);
         }
         routeButtonGroup.appendChild(button);
       });
@@ -171,27 +142,8 @@ function initRouteBrowser() {
     });
 }
 
-function toggleMenu(menuId, forceOff=false) {
-  let menuDiv = document.getElementById(menuId);
-  if (forceOff) {
-    menuDiv.classList.remove('open');
-  }
-  else {
-    menuDiv.classList.toggle('open');
-  }
-  //close all submenus (not working becaues they're not actually children)
-  if (!menuDiv.classList.contains('open')) {
-    let children = menuDiv.children;
-    for(let i = 0; i < children.length; i++) {
-      let child = children[i];
-      if (child.classList.contains('submenu')) {
-        toggleMenu(child.id, true);
-      }
-    }
-  }
-}
-
 function editCurrentRoute() {
   let promptString = 'Enter the edit key for this route.';
   let key = prompt(promptString, 'key');
 }
+

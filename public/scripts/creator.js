@@ -6,30 +6,6 @@ async function onload() {
   init();
 }
 
-async function loadAssets() {
-  let imagePathToElMap = {};
-  // get all hold image paths from firestore 
-  const db = firebase.firestore();
-  await db.collection('asset-paths')
-    .get()
-    .then(async(querySnapshot) => {
-      // make array of asset paths
-      let imagePaths = [];
-      querySnapshot.forEach(doc => {
-        let holdData = doc.data();
-        let path = holdData.path;
-        imagePaths.push(path);
-      });
-      const imageUrls = await Promise.all(imagePaths.map(path => getFirebaseStorageUrl(path)));
-      const imageEls = await Promise.all(imageUrls.map(url => loadImage(url)));
-      imagePaths.forEach(function(key, index) {
-        imagePathToElMap[key] = imageEls[index];
-      });
-    });
-  return imagePathToElMap;
-}
-
-
 function init(imagesObject) {
   wall = new CreatorState(document.getElementById('route-canvas'));
 }
@@ -434,22 +410,6 @@ function saveRouteToFirestore() {
     });
 }
 
-async function getFirebaseStorageUrl(path) {
-  const storage = firebase.storage();
-  const storageRef = storage.ref().child(path);
-  let url = await storageRef.getDownloadURL();
-  return url;
-}
-
-function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.addEventListener("load", () => resolve(img));
-    img.addEventListener("error", err => reject(err));
-    img.src = src;
-  });
-}
-
 function updateHoldPreview() {
   let previewImage = document.getElementById('hold-preview');
   let selection = document.getElementById('ehsm-path').value;
@@ -518,26 +478,6 @@ function applyMetadata() {
   myState.setter = document.getElementById('meta-setter').value;
   myState.description = document.getElementById('meta-desc').value;
   myState.editKey = document.getElementById('meta-key').value;
-}
-
-function toggleMenu(menuId, forceOff=false) {
-  let menuDiv = document.getElementById(menuId);
-  if (forceOff) {
-    menuDiv.classList.remove('open');
-  }
-  else {
-    menuDiv.classList.toggle('open');
-  }
-  //close all submenus (not working becaues they're not actually children)
-  if (!menuDiv.classList.contains('open')) {
-    let children = menuDiv.children;
-    for(let i = 0; i < children.length; i++) {
-      let child = children[i];
-      if (child.classList.contains('submenu')) {
-        toggleMenu(child.id, true);
-      }
-    }
-  }
 }
 
 function addTagFromMetaMenu() {
