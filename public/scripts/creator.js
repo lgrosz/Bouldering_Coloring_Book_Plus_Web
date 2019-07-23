@@ -413,6 +413,10 @@ function fixupEditMenu(selection) {
   updateHoldPreview();
 }
 
+function fixupMetaMenu() {
+//  document.getElementById().value = myState.;
+}
+
 function applyHoldChanges() {
   myState.selection.x = parseInt(document.getElementById('ehsm-x').value);
   myState.selection.y = parseInt(document.getElementById('ehsm-y').value);
@@ -426,7 +430,7 @@ function applyHoldChanges() {
   myState.valid = false;
 }
 
-function saveRouteToFirestore() {
+function svRue() {
   console.log('Saving route...');
   let route = myState.route;
   // should do check here
@@ -439,6 +443,52 @@ function saveRouteToFirestore() {
     .catch(() => {
       console.log('Error writing document.')
     });
+}
+
+async function saveRoute() {
+  console.log('Saving route...');
+  let db = firebase.firestore();
+  if (myState.routeId === null || !myState.keyAccepted) {
+    saveRouteAs();
+    return;
+  }
+  let route = myState.route;
+  let routeRef = db.collection('routes').doc(myState.routeId);
+  let docSnapshot = await routeRef.get()
+  if (docSnapshot.exists) {
+    if (confirm('Are you sure you want to overwrite current route version?')) {
+      db.collection('routes').doc(routeRef.id).set(route);
+      console.log('Successfully overwrote route.');
+    }
+    else {
+      saveRouteAs();
+    }
+  }
+  else {
+    db.collection('routes').routeRef.set(route);
+  }
+}
+
+async function saveRouteAs() {
+  console.log('Saving route as...');
+  let db = firebase.firestore();
+  let route = myState.route;
+  let promptText = 'To save your route, enter an edit key for later';
+  let key = prompt(promptText, 'default');
+  if (key === null) {
+    console.log('Saving route cancelled');
+    return;
+  }
+  route.editKey = key;
+  try {
+    let routeRef = await db.collection('routes').add(route);
+    myState.routeId = routeRef.id;
+    myState.keyAccepted = true;
+    console.log('Successfully saved route.');
+  }
+  catch {
+    console.log('Could not save route.');
+  }
 }
 
 function updateHoldPreview() {
@@ -509,7 +559,6 @@ function applyMetadata() {
   route.grade = document.getElementById('meta-grade').value;
   route.setter = document.getElementById('meta-setter').value;
   route.description = document.getElementById('meta-desc').value;
-  route.editKey = document.getElementById('meta-key').value;
 }
 
 function addTagFromMetaMenu() {
@@ -517,7 +566,7 @@ function addTagFromMetaMenu() {
   let tags = myState.route.tags;
   if (tag != '') {
     if (tags.indexOf(tag) === -1) {
-      myState.tags.push(tag);
+      myState.route.tags.push(tag);
       addTagToTagDisplay(tag);
     }
   }

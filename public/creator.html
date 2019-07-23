@@ -72,7 +72,6 @@
       <input id='meta-grade' type='text' placeholder='Grade'>
       <input id='meta-setter' type='text' placeholder='Setter'>
       <textarea id='meta-desc' placeholder='Route Description'></textarea>
-      <input id='meta-key' type='text' placeholder='Edit Key'>
       <input id='meta-add-tag' type='text' placeholder='Tag'>
       <button type='button' onclick='addTagFromMetaMenu()'>+</button>
       <ul id='taglist' class='taglist'>
@@ -81,7 +80,8 @@
       <button type='button' onclick='applyMetadata()'>Apply</button>
     </div>
     <div id='saveroutesubmenu' class='submenu right0'>
-      <button type='button' onclick='saveRouteToFirestore()'>Save</button>
+      <button type='button' onclick='saveRoute()'>Save</button>
+      <button type='button' onclick='saveRouteAs()'>Save As</button>
     </div>
     <div id='holdbrowser' class='submenu right1'>
       <!-- Tab links -->
