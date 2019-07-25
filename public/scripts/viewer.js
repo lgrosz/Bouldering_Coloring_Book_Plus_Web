@@ -147,7 +147,9 @@ function populateRouteBrowser() {
 function editCurrentRoute() {
   let promptString = 'Enter the edit key for this route.';
   let key = prompt(promptString, 'key');
-  let parameters = '?id=' + myState.routeId + '&key=' + key;
-  window.location.href = 'creator.html' + parameters;
+  console.log(key);
+  if (key != null) {
+    let parameters = '?id=' + myState.routeId + '&key=' + key;
+    window.location.href = 'creator.html' + parameters;
+  }
 }
-

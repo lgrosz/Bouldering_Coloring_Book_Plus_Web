@@ -8,16 +8,20 @@ async function onload() {
   // deal with url parameters
   let params = getUrlParams();
   if (params['id'] != undefined) {
+    // sets route id TODO, should not do this internally - should return route id
     await loadRoute(params['id']);
     myState.valid = false;
-  }
-  if (params['key'] != undefined) {
-    let id = params['id'];
-    let key = params['key'];
-    myState.keyAccepted = await isMatchingKey(id, key);
+    if (params['key'] != undefined) {
+      let id = params['id'];
+      let key = params['key'];
+      myState.keyAccepted = await isMatchingKey(id, key);
+    }
   }
 
+  // do initial maintainence
+  updateSaveNotification();
   populateHoldBrowser();
+  fixupMetaData();
 }
 
 async function isMatchingKey(id, key) {
@@ -223,7 +227,6 @@ function CreatorState(canvas) {
 
 CreatorState.prototype.addHold = function(hold) {
   this.route.holds.push(hold);
-  console.log(this.route.holds);
   this.valid = false;
 }
 
@@ -232,11 +235,11 @@ CreatorState.prototype.clear = function() {
 }
 
 CreatorState.prototype.deleteHold = function() {
-  let holds = myState.holds;
+  let holds = myState.route.holds;
   let l = holds.length;
   for (let i = 0; i < l; i++) {
     if (holds[i] == myState.selection) {
-      myState.holds.splice(i, 1);
+      myState.route.holds.splice(i, 1);
       myState.selection = null;
       let editHoldButton = document.getElementById('edit-hold-button');
       editHoldButton.classList.add('hidden');
@@ -586,3 +589,24 @@ function addTagToTagDisplay(tag) {
   tagList.appendChild(tagItem);
 }
 
+function updateSaveNotification() {
+  let div = document.getElementById('save-notification');
+  let notification = 'Editing a new route';
+  if (myState.routeId != null) {
+    if (myState.keyAccepted) {
+      notification = 'Overwriting route with id ' + myState.routeId
+    }
+  }
+  div.innerHTML = notification;
+}
+
+function fixupMetaData() {
+  let route = myState.route;
+  document.getElementById('meta-name').value = route.name;
+  document.getElementById('meta-grade').value = route.grade;
+  document.getElementById('meta-setter').value = route.setter;
+  document.getElementById('meta-desc').value = route.description;
+  for (tag of route.tags) {
+    addTagToTagDisplay(tag);
+  }
+}
