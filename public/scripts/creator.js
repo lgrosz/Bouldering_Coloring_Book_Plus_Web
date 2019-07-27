@@ -428,19 +428,6 @@ function fixupEditMenu(selection) {
   updateHoldPreview();
 }
 
-function applyHoldChanges() {
-  myState.selection.x = parseInt(document.getElementById('ehsm-x').value);
-  myState.selection.y = parseInt(document.getElementById('ehsm-y').value);
-  myState.selection.r = parseInt(document.getElementById('ehsm-r').value);
-  myState.selection.f = document.getElementById('ehsm-f').checked;
-  myState.selection.sx = parseFloat(document.getElementById('ehsm-sx').value);
-  myState.selection.sy = parseFloat(document.getElementById('ehsm-sy').value);
-  myState.selection.model = document.getElementById('ehsm-path').value;
-  myState.selection.c = document.getElementById('ehsm-color').value;
-  //check if all of these are valid first
-  myState.valid = false;
-}
-
 function svRue() {
   console.log('Saving route...');
   let route = myState.route;
@@ -564,6 +551,8 @@ function populateHoldBrowser() {
           let selectionEl = editMenuModelSelect;
           selectionEl.value = path;
           updateHoldPreview();
+          myState.selection.model = path;
+          myState.valid = false;
         });
       }
     }
@@ -641,6 +630,11 @@ function addEditHoldEventListeners() {
     myState.selection.r = parseInt(rInput.value);
     myState.valid = false;
   }
+  let fInput = document.getElementById('ehsm-f');
+  fInput.onchange = function () {
+    myState.selection.f = fInput.checked;
+    myState.valid = false;
+  }
   let sxInput = document.getElementById('ehsm-sx');
   sxInput.oninput = function () {
     myState.selection.sx = parseFloat(sxInput.value);
@@ -649,6 +643,11 @@ function addEditHoldEventListeners() {
   let syInput = document.getElementById('ehsm-sy');
   syInput.oninput = function () {
     myState.selection.sy = parseFloat(syInput.value);
+    myState.valid = false;
+  }
+  let pathInput = document.getElementById('ehsm-path');
+  pathInput.onchange = function () {
+    myState.selection.model = pathInput.value;
     myState.valid = false;
   }
 }
