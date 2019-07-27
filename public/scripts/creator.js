@@ -20,6 +20,7 @@ async function onload() {
 
   // do initial maintainence
   addCssEventListeners();
+  addEditHoldEventListeners();
   updateSaveNotification();
   populateHoldBrowser();
   fixupMetaData();
@@ -416,19 +417,15 @@ function contains(hold, mx, my) {
 }
 
 function fixupEditMenu(selection) {
-  document.getElementById('ehsm-x').value = selection.x;
-  document.getElementById('ehsm-y').value = selection.y;
-  document.getElementById('ehsm-r').value = selection.r;
+  document.getElementById('ehsm-x').value = parseInt(selection.x);
+  document.getElementById('ehsm-y').value = parseInt(selection.y);
+  document.getElementById('ehsm-r').value = parseInt(selection.r);
   document.getElementById('ehsm-f').checked = selection.f;
-  document.getElementById('ehsm-sx').value = selection.sx;
-  document.getElementById('ehsm-sy').value = selection.sy;
+  document.getElementById('ehsm-sx').value = parseFloat(selection.sx);
+  document.getElementById('ehsm-sy').value = parseFloat(selection.sy);
   document.getElementById('ehsm-color').value = selection.c;
   document.getElementById('ehsm-path').value = selection.model;
   updateHoldPreview();
-}
-
-function fixupMetaMenu() {
-//  document.getElementById().value = myState.;
 }
 
 function applyHoldChanges() {
@@ -625,5 +622,33 @@ function fixupMetaData() {
   document.getElementById('meta-desc').value = route.description;
   for (tag of route.tags) {
     addTagToTagDisplay(tag);
+  }
+}
+
+function addEditHoldEventListeners() {
+  let xInput = document.getElementById('ehsm-x');
+  xInput.oninput = function () {
+    myState.selection.x = parseInt(xInput.value);
+    myState.valid = false;
+  }
+  let yInput = document.getElementById('ehsm-y');
+  yInput.oninput = function () {
+    myState.selection.y = parseInt(yInput.value);
+    myState.valid = false;
+  }
+  let rInput = document.getElementById('ehsm-r');
+  rInput.oninput = function () {
+    myState.selection.r = parseInt(rInput.value);
+    myState.valid = false;
+  }
+  let sxInput = document.getElementById('ehsm-sx');
+  sxInput.oninput = function () {
+    myState.selection.sx = parseFloat(sxInput.value);
+    myState.valid = false;
+  }
+  let syInput = document.getElementById('ehsm-sy');
+  syInput.oninput = function () {
+    myState.selection.sy = parseFloat(syInput.value);
+    myState.valid = false;
   }
 }
