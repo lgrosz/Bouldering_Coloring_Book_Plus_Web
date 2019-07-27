@@ -2,9 +2,11 @@
 <html>
   <head>
     <meta charset='utf-8'> <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
     <link rel='stylesheet' type='text/css' href='styles/allStyles.css'>
-    <link rel="stylesheet" href='styles/SlidingMenus.css'>
-    <link rel="stylesheet" href='styles/creator/Creator.css'>
+    <link rel='stylesheet' href='styles/SlidingMenus.css'>
+    <link rel='stylesheet' href='styles/Accordion.css'>
+    <link rel='stylesheet' href='styles/creator/Creator.css'>
     <!--<link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>--!>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"/>
     <title>Bouldering Coloring Book +</title>
@@ -26,18 +28,20 @@
     </div>
     <div id='mainMenu'>
       <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
-        <a title='Home' href='index.html'>
-          <i class='fa fa-home'></i>
-        </a>
-        <a title='Viewer' href='viewer.html'>
-          <i class='fa fa-eye'></i>
-        </a>
-        <a title='Creator' class='active' href='creator.html'>
-          <i class='fa fa-wrench'></i>
-        </a>
-        <a title='About' href='about.html'>
-          <i class='fa fa-question'></i>
-        </a>
+        <ul class='big-link-list'>
+          <li>
+            <a title='Home' class='big-link' href='index.html'>Home</a>
+          </li>
+          <li>
+            <a title='Viewer' class='big-link' href='viewer.html'>Viewer</a>
+          </li>
+          <li>
+            <a title='Creator' class='big-link' href='creator.html'>Creator</a>
+          </li>
+          <li>
+            <a title='About' class='big-link' href='about.html'>About</a>
+          </li>
+        </ul>
       </div>
     </div>
     <div id='editMenu'>
@@ -59,22 +63,27 @@
         <button type='button' onclick='applyMetadata()'>Apply</button>
       </div>
       <div id='holdMenu' class='menu-content right-menu-content' icon='&#xf1de'>
-        Position: <br />
-        x: <input id='ehsm-x' type='number'><br />
-        y: <input id='ehsm-y' type='number'><br />
-        r: <input id='ehsm-r' type='number'><br />
-        f: <input id='ehsm-f' type='checkbox'><br /><br />
-        Scaling: <br />
-        sx: <input id='ehsm-sx' type='number'><br />
-        sy: <input id='ehsm-sy' type='number'><br /><br />
-        Hold: <br />
-        color: <input id='ehsm-color' type='text'><br />
-        Model: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'>
-              </select><br />
-              <button onclick='toggleMenu("holdbrowser")'>Browse</button><br /><br />
-        Preview: <br />
-        <div id='hold-preview' class='img-div'>
+        <button class="accordion">Position</button>
+        <div class='accordion-panel'>
+          x: <input id='ehsm-x' type='number'><br />
+          y: <input id='ehsm-y' type='number'><br />
+          r: <input id='ehsm-r' type='number'><br />
+          f: <input id='ehsm-f' type='checkbox'><br /><br />
         </div>
+        <button class='accordion'>Scaling</button>
+        <div class='accordion-panel'>
+          sx: <input id='ehsm-sx' type='number'><br />
+          sy: <input id='ehsm-sy' type='number'><br /><br />
+        </div>
+        <button class='accordion'>Color and Model</button>
+          <div class='accordion-panel'>
+            color: <input id='ehsm-color' type='text'><br />
+            Model: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'></select><br />
+              <button onclick='toggleMenu("holdbrowser")'>Browse</button><br /><br />
+            Preview: <br />
+            <div id='hold-preview' class='img-div'>
+            </div>
+          </div>
         <button type='button' onclick='applyHoldChanges()'>Apply</button>
       </div>
     </div>

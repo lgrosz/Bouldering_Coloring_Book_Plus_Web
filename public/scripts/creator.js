@@ -19,6 +19,7 @@ async function onload() {
   }
 
   // do initial maintainence
+  addCssEventListeners();
   updateSaveNotification();
   populateHoldBrowser();
   fixupMetaData();
@@ -74,6 +75,23 @@ async function loadRoute(id) {
     myState.route = route;
     myState.resetWall();
     console.log('Successfully loaded route.');
+  }
+}
+
+function addCssEventListeners() {
+  // ACCORDIONS
+  let accordions = document.getElementsByClassName('accordion');
+
+  for (acc of accordions) {
+    acc.addEventListener("click", function() {
+      this.classList.toggle("active");
+      let panel = this.nextElementSibling;
+      if (panel.style.maxHeight){
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = panel.scrollHeight + "px";
+      } 
+    });
   }
 }
 

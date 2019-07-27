@@ -17,7 +17,8 @@
   top: 50%;
   transform: translateY(-50%);
   transition: 0.3s;
-  opacity: 0.9;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .menu-content:hover {
