@@ -4,7 +4,10 @@
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' href='styles/allStyles.css'>
-    <link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>
+    <link rel="stylesheet" href='styles/SlidingMenus.css'>
+    <link rel="stylesheet" href='styles/viewer/Viewer.css'>
+    <!--<link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>--!>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"/>
     <title>Bouldering Coloring Book +</title>
     <!-- update the version number as needed -->
     <script defer src='/__/firebase/6.2.2/firebase-app.js'></script>
@@ -25,35 +28,36 @@
       <h2 id='routesetter'></h2>
       <p id='routedesc'></p>
     </div>
-    <div class='sidenav left'>
-      <a title='Home' href='index.html'>
-        <i class='fa fa-home'></i>
-      </a>
-      <a title='Viewer' class='active' href='viewer.html'>
-        <i class='fa fa-eye'></i>
-      </a>
-      <a title='Creator' href='creator.html'>
-        <i class='fa fa-wrench'></i>
-      </a>
-      <a title='About' href='about.html'>
-        <i class='fa fa-question'></i>
-      </a>
+    <div id='mainMenu'>
+      <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
+        <a title='Home' href='index.html'>
+          <i class='fa fa-home'></i>
+        </a>
+        <a title='Viewer' href='viewer.html'>
+          <i class='fa fa-eye'></i>
+        </a>
+        <a title='Creator' class='active' href='creator.html'>
+          <i class='fa fa-wrench'></i>
+        </a>
+        <a title='About' href='about.html'>
+          <i class='fa fa-question'></i>
+        </a>
+      </div>
     </div>
-    <div class='sidenav right'>
-      <a href='javascript:void(0)' class='opensubmenu' onclick='toggleMenu("route-browser")'>
-        <i class='fa fa-list'></i>
-      </a>
-      <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
-        <i class='fa fa-pencil'></i>
-      </a>
-    </div>
-    <div id='route-browser' class='submenu right0'>
-      <input type='text' placeholder='Search...'>
-      <a href='javascript:void(0)' onclick='filterRoutes()'>
-        <i class='fa fa-filter'></i>
-      </a>
-      <div id='route-button-group'>
-        <!-- Route buttons go here!--!>
+    <div id='editMenu'>
+      <div id='routeMenu' class='menu-content right-menu-content' icon='&#xf03a'>
+        <input type='text' placeholder='Search...'>
+        <a href='javascript:void(0)' onclick='filterRoutes()'>
+          <i class='fa fa-filter'></i>
+        </a>
+        <div id='route-button-group'>
+          <!-- Route buttons go here!--!>
+        </div>
+      </div>
+      <div id='editRouteMenu' class='menu-content right-menu-content' icon='&#xf044'>
+        <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
+          <i class='fa fa-pencil'></i>
+        </a>
       </div>
     </div>
   </body>

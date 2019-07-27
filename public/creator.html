@@ -3,7 +3,10 @@
   <head>
     <meta charset='utf-8'> <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' href='styles/allStyles.css'>
-    <link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>
+    <link rel="stylesheet" href='styles/SlidingMenus.css'>
+    <link rel="stylesheet" href='styles/creator/Creator.css'>
+    <!--<link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>--!>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"/>
     <title>Bouldering Coloring Book +</title>
     <!-- update the version number as needed -->
     <script defer src='/__/firebase/6.2.2/firebase-app.js'></script>
@@ -21,66 +24,59 @@
     <div id='wall-div'>
       <canvas id='route-canvas' tabindex='1'></canvas>
     </div>
-    <div class='sidenav left'>
-      <a title='Home' href='index.html'>
-        <i class='fa fa-home'></i>
-      </a>
-      <a title='Viewer' href='viewer.html'>
-        <i class='fa fa-eye'></i>
-      </a>
-      <a title='Creator' class='active' href='creator.html'>
-        <i class='fa fa-wrench'></i>
-      </a>
-      <a title='About' href='about.html'>
-        <i class='fa fa-question'></i>
-      </a>
-    </div>
-    <div class='sidenav right'>
-      <a title='Edit' id='edit-hold-button' class='hidden' href='javascript:void(0)' onclick='toggleMenu("editholdsubmenu")'>
-        <i class='fa fa-sliders'></i>
-      </a>
-      <a title='Metadata' id='edit-meta-button' href='javascript:void(0)' onclick='toggleMenu("metadatasubmenu")'>
-        <i class='fa fa-edit'></i>
-      </a>
-      <a title='Save' id='save-route-button' href='javascript:void(0)' onclick='toggleMenu("saveroutesubmenu")'>
-        <i class='fa fa-save'></i>
-      </a>
-    </div>
-    <div id='editholdsubmenu' class='submenu right0'>
-      Position: <br />
-      x: <input id='ehsm-x' type='number'><br />
-      y: <input id='ehsm-y' type='number'><br />
-      r: <input id='ehsm-r' type='number'><br />
-      f: <input id='ehsm-f' type='checkbox'><br /><br />
-      Scaling: <br />
-      sx: <input id='ehsm-sx' type='number'><br />
-      sy: <input id='ehsm-sy' type='number'><br /><br />
-      Hold: <br />
-      color: <input id='ehsm-color' type='text'><br />
-      Model: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'>
-            </select><br />
-            <button onclick='toggleMenu("holdbrowser")'>Browse</button><br /><br />
-      Preview: <br />
-      <div id='hold-preview' class='img-div'>
+    <div id='mainMenu'>
+      <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
+        <a title='Home' href='index.html'>
+          <i class='fa fa-home'></i>
+        </a>
+        <a title='Viewer' href='viewer.html'>
+          <i class='fa fa-eye'></i>
+        </a>
+        <a title='Creator' class='active' href='creator.html'>
+          <i class='fa fa-wrench'></i>
+        </a>
+        <a title='About' href='about.html'>
+          <i class='fa fa-question'></i>
+        </a>
       </div>
-      <button type='button' onclick='applyHoldChanges()'>Apply</button>
     </div>
-    <div id='metadatasubmenu' class='submenu right0'>
-      <input id='meta-name' type='text' placeholder='Name'>
-      <input id='meta-grade' type='text' placeholder='Grade'>
-      <input id='meta-setter' type='text' placeholder='Setter'>
-      <textarea id='meta-desc' placeholder='Route Description'></textarea>
-      <input id='meta-add-tag' type='text' placeholder='Tag'>
-      <button type='button' onclick='addTagFromMetaMenu()'>+</button>
-      <ul id='taglist' class='taglist'>
-        <!-- tags buttons go here --!>
-      </ul>
-      <button type='button' onclick='applyMetadata()'>Apply</button>
-    </div>
-    <div id='saveroutesubmenu' class='submenu right0'>
-      <div id='save-notification'></div>
-      <button type='button' onclick='saveRoute()'>Save</button>
-      <button type='button' onclick='saveRouteAs()'>Save As</button>
+    <div id='editMenu'>
+      <div id='saveMenu' class='menu-content right-menu-content' icon='&#xf0c7'>
+        <div id='save-notification'></div>
+        <button type='button' onclick='saveRoute()'>Save</button>
+        <button type='button' onclick='saveRouteAs()'>Save As</button>
+      </div>
+      <div id='metaMenu' class='menu-content right-menu-content' icon='&#xf15b'>
+        <input id='meta-name' type='text' placeholder='Name'>
+        <input id='meta-grade' type='text' placeholder='Grade'>
+        <input id='meta-setter' type='text' placeholder='Setter'>
+        <textarea id='meta-desc' placeholder='Route Description'></textarea>
+        <input id='meta-add-tag' type='text' placeholder='Tag'>
+        <button type='button' onclick='addTagFromMetaMenu()'>+</button>
+        <ul id='taglist' class='taglist'>
+          <!-- tags buttons go here --!>
+        </ul>
+        <button type='button' onclick='applyMetadata()'>Apply</button>
+      </div>
+      <div id='holdMenu' class='menu-content right-menu-content' icon='&#xf1de'>
+        Position: <br />
+        x: <input id='ehsm-x' type='number'><br />
+        y: <input id='ehsm-y' type='number'><br />
+        r: <input id='ehsm-r' type='number'><br />
+        f: <input id='ehsm-f' type='checkbox'><br /><br />
+        Scaling: <br />
+        sx: <input id='ehsm-sx' type='number'><br />
+        sy: <input id='ehsm-sy' type='number'><br /><br />
+        Hold: <br />
+        color: <input id='ehsm-color' type='text'><br />
+        Model: <select id='ehsm-path' type='text' onchange='updateHoldPreview();'>
+              </select><br />
+              <button onclick='toggleMenu("holdbrowser")'>Browse</button><br /><br />
+        Preview: <br />
+        <div id='hold-preview' class='img-div'>
+        </div>
+        <button type='button' onclick='applyHoldChanges()'>Apply</button>
+      </div>
     </div>
     <div id='holdbrowser' class='submenu right1'>
       <!-- Tab links -->

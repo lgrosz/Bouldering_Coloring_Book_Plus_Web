@@ -115,7 +115,6 @@ function CreatorState(canvas) {
 
   // for setting state letiables for mouse down
   canvas.addEventListener('mousedown', function(e) {
-    let editHoldButton = document.getElementById('edit-hold-button');
     let mouse = myState.getMouse(e);
     let scale = myState.scale;
     let mx = mouse.x / scale;
@@ -130,12 +129,9 @@ function CreatorState(canvas) {
         myState.selection = mySel;
         myState.dragging = true;
         myState.valid = false;
-        editHoldButton.classList.remove('hidden');
         return;
       }
       myState.selection = null;
-      editHoldButton.classList.add('hidden');
-      toggleMenu('editholdsubmenu',forceOff=true);
       myState.valid = false;
     }
   });
@@ -241,9 +237,6 @@ CreatorState.prototype.deleteHold = function() {
     if (holds[i] == myState.selection) {
       myState.route.holds.splice(i, 1);
       myState.selection = null;
-      let editHoldButton = document.getElementById('edit-hold-button');
-      editHoldButton.classList.add('hidden');
-      toggleMenu('editholdsubmenu' ,forceOff=true);
       return;
     }
   }

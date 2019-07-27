@@ -1,0 +1,15 @@
+/***********************************************************************
+ * MAIN MENU
+ **********************************************************************/
+/* Style the links inside the sidenav */
+#mainMenu #navMenu {
+  background-color: rgba(76, 175, 80,0.9);
+}
+
+#mainMenu #navMenu:before {
+  top: 20px;
+  background-color: rgba(76, 175, 80,0.9);
+}
+
+#mainMenu #navMenu:active {
+  background-color: green;
