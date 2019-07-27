@@ -61,9 +61,7 @@
             </select><br />
             <button onclick='toggleMenu("holdbrowser")'>Browse</button><br /><br />
       Preview: <br />
-      <div class='img-div'>
-        <span class='helper'></span>
-        <img id='hold-preview' class='preview'></img>
+      <div id='hold-preview' class='img-div'>
       </div>
       <button type='button' onclick='applyHoldChanges()'>Apply</button>
     </div>
@@ -80,6 +78,7 @@
       <button type='button' onclick='applyMetadata()'>Apply</button>
     </div>
     <div id='saveroutesubmenu' class='submenu right0'>
+      <div id='save-notification'></div>
       <button type='button' onclick='saveRoute()'>Save</button>
       <button type='button' onclick='saveRouteAs()'>Save As</button>
     </div>

@@ -495,9 +495,15 @@ async function saveRouteAs() {
 }
 
 function updateHoldPreview() {
-  let previewImage = document.getElementById('hold-preview');
-  let selection = document.getElementById('ehsm-path').value;
-  previewImage.src = assets[selection.model];
+  let previewImagePath = document.getElementById('ehsm-path').value;
+  let previewImageEl = assets[previewImagePath].cloneNode(true);
+  previewImageEl.classList.add('preview');
+  let previewImageDiv = document.getElementById('hold-preview');
+  let lastPreviewImageEl = previewImageDiv.lastElementChild;
+  if (lastPreviewImageEl != null) {
+    previewImageDiv.removeChild(lastPreviewImageEl);
+  }
+  previewImageDiv.appendChild(previewImageEl);
 }
 
 //////////////
