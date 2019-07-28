@@ -21,6 +21,7 @@ async function onload() {
   // do initial maintainence
   addCssEventListeners();
   addEditHoldEventListeners();
+  addMetaDataEventListeners();
   updateSaveNotification();
   populateHoldBrowser();
   fixupMetaData();
@@ -105,7 +106,7 @@ function CreatorState(canvas) {
   this.route = {
     'name': null,
     'description': null,
-    'grade': null,
+    'grade': 0,
     'setter': null,
     'holds': [],
     'editKey': null,
@@ -559,13 +560,6 @@ function populateHoldBrowser() {
   }
 }
 
-function applyMetadata() {
-  let route = myState.route;
-  route.name = document.getElementById('meta-name').value;
-  route.grade = document.getElementById('meta-grade').value;
-  route.setter = document.getElementById('meta-setter').value;
-  route.description = document.getElementById('meta-desc').value;
-}
 
 function addTagFromMetaMenu() {
   let tag = document.getElementById('meta-add-tag').value.toLowerCase()
@@ -606,7 +600,7 @@ function updateSaveNotification() {
 function fixupMetaData() {
   let route = myState.route;
   document.getElementById('meta-name').value = route.name;
-  document.getElementById('meta-grade').value = route.grade;
+  document.getElementById('route-grade-display').innerHTML = route.grade;
   document.getElementById('meta-setter').value = route.setter;
   document.getElementById('meta-desc').value = route.description;
   for (tag of route.tags) {
@@ -650,4 +644,37 @@ function addEditHoldEventListeners() {
     myState.selection.model = pathInput.value;
     myState.valid = false;
   }
+}
+
+function addMetaDataEventListeners() {
+  let nameInput = document.getElementById('meta-name');
+  nameInput.oninput = function () {
+    myState.route.name = nameInput.value;
+  }
+  let setterInput = document.getElementById('meta-setter');
+  setterInput.oniput = function () {
+    myState.route.setter = setterInput.value;
+  }
+  let descInput = document.getElementById('meta-desc');
+  descInput.oninput = function () {
+    myState.route.description = descInput.value;
+  }
+}
+
+function increaseGrade() {
+  let grade = myState.route.grade;
+  if (grade < 16) {
+    grade = ++myState.route.grade;
+  }
+  gradeDisplay = document.getElementById('route-grade-display');
+  gradeDisplay.innerHTML = grade;
+}
+
+function decreaseGrade() {
+  let grade = myState.route.grade;
+  if (grade > 0) {
+    grade = --myState.route.grade;
+  }
+  gradeDisplay = document.getElementById('route-grade-display');
+  gradeDisplay.innerHTML = grade;
 }
