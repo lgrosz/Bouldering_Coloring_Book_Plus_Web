@@ -60,11 +60,10 @@
           <button class='fancy' onclick='increaseGrade()'>+</button>
         </div>
         <textarea id='meta-desc' class='fancy' placeholder='Route Description'></textarea>
-        <input id='meta-add-tag' class='fancy' type='text' placeholder='Tag'>
-        <button type='button' class='fancy' onclick='addTagFromMetaMenu()'>+</button>
-        <ul id='taglist' class='taglist'>
-          <!-- tags buttons go here --!>
-        </ul>
+        <div id='tag-div'>
+          <div id='tag-set'></div>
+          <input id='tag-input' type='text' placeholder='Tab to add a tag'></input>
+        </div>
       </div>
       <div id='holdMenu' class='menu-content right-menu-content' icon='&#xf1de'>
         <button class="accordion">Position</button>

@@ -5,6 +5,9 @@ async function onload() {
   assets = await loadAssets();
   myState = new CreatorState(document.getElementById('route-canvas'));
 
+  //pre load
+  setupTagInput();
+
   // deal with url parameters
   let params = getUrlParams();
   if (params['id'] != undefined) {
@@ -560,32 +563,6 @@ function populateHoldBrowser() {
   }
 }
 
-
-function addTagFromMetaMenu() {
-  let tag = document.getElementById('meta-add-tag').value.toLowerCase()
-  let tags = myState.route.tags;
-  if (tag != '') {
-    if (tags.indexOf(tag) === -1) {
-      myState.route.tags.push(tag);
-      addTagToTagDisplay(tag);
-    }
-  }
-}
-
-function addTagToTagDisplay(tag) {
-  let tagList = document.getElementById('taglist');
-  let tagItem = document.createElement('li');
-  tagItem.innerHTML = tag + ' | x' ;
-  tagItem.setAttribute('data-tagString', tag);
-  tagItem.addEventListener('click', function () {
-    let tagString = this.getAttribute('data-tagString');
-    indexToRemove = myState.tags.indexOf(tagString)
-    myState.tags.splice(indexToRemove, 1);
-    this.remove();
-  });
-  tagList.appendChild(tagItem);
-}
-
 function updateSaveNotification() {
   let div = document.getElementById('save-notification');
   let notification = 'Editing a new route';
@@ -603,8 +580,8 @@ function fixupMetaData() {
   document.getElementById('route-grade-display').innerHTML = route.grade;
   document.getElementById('meta-setter').value = route.setter;
   document.getElementById('meta-desc').value = route.description;
-  for (tag of route.tags) {
-    addTagToTagDisplay(tag);
+  for (tagString of route.tags) {
+    addTag(tagString);
   }
 }
 
@@ -677,4 +654,50 @@ function decreaseGrade() {
   }
   gradeDisplay = document.getElementById('route-grade-display');
   gradeDisplay.innerHTML = grade;
+}
+
+/***********************************************************************
+ * TAGS
+ **********************************************************************/
+function setupTagInput() {
+  let tagInput = document.getElementById('tag-input');
+  let tagSet = document.getElementById('tag-set');
+  let TABKEY = 9;
+  
+  tagInput.addEventListener('keydown' , e => {
+    let tagInput = document.getElementById('tag-input');
+    if(e.keyCode == TABKEY) {
+      let tagString = tagInput.value.trim().toLowerCase();
+      if(e.preventDefault) {
+        e.preventDefault();
+        if (tagString == '') {
+          return false;
+        }
+        if (myState.route.tags.indexOf(tagString) != -1) {
+          return false;
+        }
+        addTag(tagString);
+        myState.route.tags.push(tagString);
+        tagInput.value = '';
+      }
+      return false;
+    }
+  });
+}
+
+function addTag(tagString) {
+  let tag = document.createElement('div');
+  let aTag = document.createElement('a');
+  let spanTag = document.createElement('span');
+  tag.classList.add('tag');
+  aTag.innerHTML = '<i class="fa fa-times"></i>';
+  spanTag.innerHTML = tagString;
+  //remove tag
+  aTag.addEventListener('click', function() {
+    this.parentElement.parentElement.removeChild(this.parentElement);
+    myState.route.tags.splice(myState.route.tags.indexOf(tagString),1);
+  });
+  tag.appendChild(aTag);
+  tag.appendChild(spanTag);
+  document.getElementById('tag-set').appendChild(tag);
 }
