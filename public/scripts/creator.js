@@ -19,6 +19,9 @@ async function onload() {
   }
 
   // do initial maintainence
+  addCssEventListeners();
+  addEditHoldEventListeners();
+  addMetaDataEventListeners();
   updateSaveNotification();
   populateHoldBrowser();
   fixupMetaData();
@@ -77,6 +80,23 @@ async function loadRoute(id) {
   }
 }
 
+function addCssEventListeners() {
+  // ACCORDIONS
+  let accordions = document.getElementsByClassName('accordion');
+
+  for (acc of accordions) {
+    acc.addEventListener("click", function() {
+      this.classList.toggle("active");
+      let panel = this.nextElementSibling;
+      if (panel.style.maxHeight){
+        panel.style.maxHeight = null;
+      } else {
+        panel.style.maxHeight = panel.scrollHeight + "px";
+      } 
+    });
+  }
+}
+
 function CreatorState(canvas) {
   // setup canvas dimensions
   this.div = document.getElementById('wall-div');
@@ -86,7 +106,7 @@ function CreatorState(canvas) {
   this.route = {
     'name': null,
     'description': null,
-    'grade': null,
+    'grade': 0,
     'setter': null,
     'holds': [],
     'editKey': null,
@@ -115,7 +135,6 @@ function CreatorState(canvas) {
 
   // for setting state letiables for mouse down
   canvas.addEventListener('mousedown', function(e) {
-    let editHoldButton = document.getElementById('edit-hold-button');
     let mouse = myState.getMouse(e);
     let scale = myState.scale;
     let mx = mouse.x / scale;
@@ -130,12 +149,9 @@ function CreatorState(canvas) {
         myState.selection = mySel;
         myState.dragging = true;
         myState.valid = false;
-        editHoldButton.classList.remove('hidden');
         return;
       }
       myState.selection = null;
-      editHoldButton.classList.add('hidden');
-      toggleMenu('editholdsubmenu',forceOff=true);
       myState.valid = false;
     }
   });
@@ -241,9 +257,6 @@ CreatorState.prototype.deleteHold = function() {
     if (holds[i] == myState.selection) {
       myState.route.holds.splice(i, 1);
       myState.selection = null;
-      let editHoldButton = document.getElementById('edit-hold-button');
-      editHoldButton.classList.add('hidden');
-      toggleMenu('editholdsubmenu' ,forceOff=true);
       return;
     }
   }
@@ -405,32 +418,15 @@ function contains(hold, mx, my) {
 }
 
 function fixupEditMenu(selection) {
-  document.getElementById('ehsm-x').value = selection.x;
-  document.getElementById('ehsm-y').value = selection.y;
-  document.getElementById('ehsm-r').value = selection.r;
+  document.getElementById('ehsm-x').value = parseInt(selection.x);
+  document.getElementById('ehsm-y').value = parseInt(selection.y);
+  document.getElementById('ehsm-r').value = parseInt(selection.r);
   document.getElementById('ehsm-f').checked = selection.f;
-  document.getElementById('ehsm-sx').value = selection.sx;
-  document.getElementById('ehsm-sy').value = selection.sy;
+  document.getElementById('ehsm-sx').value = parseFloat(selection.sx);
+  document.getElementById('ehsm-sy').value = parseFloat(selection.sy);
   document.getElementById('ehsm-color').value = selection.c;
   document.getElementById('ehsm-path').value = selection.model;
   updateHoldPreview();
-}
-
-function fixupMetaMenu() {
-//  document.getElementById().value = myState.;
-}
-
-function applyHoldChanges() {
-  myState.selection.x = parseInt(document.getElementById('ehsm-x').value);
-  myState.selection.y = parseInt(document.getElementById('ehsm-y').value);
-  myState.selection.r = parseInt(document.getElementById('ehsm-r').value);
-  myState.selection.f = document.getElementById('ehsm-f').checked;
-  myState.selection.sx = parseFloat(document.getElementById('ehsm-sx').value);
-  myState.selection.sy = parseFloat(document.getElementById('ehsm-sy').value);
-  myState.selection.model = document.getElementById('ehsm-path').value;
-  myState.selection.c = document.getElementById('ehsm-color').value;
-  //check if all of these are valid first
-  myState.valid = false;
 }
 
 function svRue() {
@@ -556,19 +552,14 @@ function populateHoldBrowser() {
           let selectionEl = editMenuModelSelect;
           selectionEl.value = path;
           updateHoldPreview();
+          myState.selection.model = path;
+          myState.valid = false;
         });
       }
     }
   }
 }
 
-function applyMetadata() {
-  let route = myState.route;
-  route.name = document.getElementById('meta-name').value;
-  route.grade = document.getElementById('meta-grade').value;
-  route.setter = document.getElementById('meta-setter').value;
-  route.description = document.getElementById('meta-desc').value;
-}
 
 function addTagFromMetaMenu() {
   let tag = document.getElementById('meta-add-tag').value.toLowerCase()
@@ -609,10 +600,81 @@ function updateSaveNotification() {
 function fixupMetaData() {
   let route = myState.route;
   document.getElementById('meta-name').value = route.name;
-  document.getElementById('meta-grade').value = route.grade;
+  document.getElementById('route-grade-display').innerHTML = route.grade;
   document.getElementById('meta-setter').value = route.setter;
   document.getElementById('meta-desc').value = route.description;
   for (tag of route.tags) {
     addTagToTagDisplay(tag);
   }
+}
+
+function addEditHoldEventListeners() {
+  let xInput = document.getElementById('ehsm-x');
+  xInput.oninput = function () {
+    myState.selection.x = parseInt(xInput.value);
+    myState.valid = false;
+  }
+  let yInput = document.getElementById('ehsm-y');
+  yInput.oninput = function () {
+    myState.selection.y = parseInt(yInput.value);
+    myState.valid = false;
+  }
+  let rInput = document.getElementById('ehsm-r');
+  rInput.oninput = function () {
+    myState.selection.r = parseInt(rInput.value);
+    myState.valid = false;
+  }
+  let fInput = document.getElementById('ehsm-f');
+  fInput.onchange = function () {
+    myState.selection.f = fInput.checked;
+    myState.valid = false;
+  }
+  let sxInput = document.getElementById('ehsm-sx');
+  sxInput.oninput = function () {
+    myState.selection.sx = parseFloat(sxInput.value);
+    myState.valid = false;
+  }
+  let syInput = document.getElementById('ehsm-sy');
+  syInput.oninput = function () {
+    myState.selection.sy = parseFloat(syInput.value);
+    myState.valid = false;
+  }
+  let pathInput = document.getElementById('ehsm-path');
+  pathInput.onchange = function () {
+    myState.selection.model = pathInput.value;
+    myState.valid = false;
+  }
+}
+
+function addMetaDataEventListeners() {
+  let nameInput = document.getElementById('meta-name');
+  nameInput.oninput = function () {
+    myState.route.name = nameInput.value;
+  }
+  let setterInput = document.getElementById('meta-setter');
+  setterInput.oniput = function () {
+    myState.route.setter = setterInput.value;
+  }
+  let descInput = document.getElementById('meta-desc');
+  descInput.oninput = function () {
+    myState.route.description = descInput.value;
+  }
+}
+
+function increaseGrade() {
+  let grade = myState.route.grade;
+  if (grade < 16) {
+    grade = ++myState.route.grade;
+  }
+  gradeDisplay = document.getElementById('route-grade-display');
+  gradeDisplay.innerHTML = grade;
+}
+
+function decreaseGrade() {
+  let grade = myState.route.grade;
+  if (grade > 0) {
+    grade = --myState.route.grade;
+  }
+  gradeDisplay = document.getElementById('route-grade-display');
+  gradeDisplay.innerHTML = grade;
 }

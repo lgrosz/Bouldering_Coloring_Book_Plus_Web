@@ -4,7 +4,10 @@
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' href='styles/allStyles.css'>
-    <link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>
+    <link rel="stylesheet" href='styles/SlidingMenus.css'>
+    <link rel="stylesheet" href='styles/index/Index.css'>
+    <!--<link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>--!>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"/>
     <title>Bouldering Coloring Book +</title>
     <!-- update the version number as needed -->
     <script defer src='/__/firebase/6.2.2/firebase-app.js'></script>
@@ -19,13 +22,23 @@
   <body>
     <script type='text/javascript' src='scripts/utilities.js'></script>
     <script type='text/javascript' src='scripts/index.js'></script>
-    <div class='sidenav left'>
-      <a title='Home' class='active'  href='index.html'><i class='fa fa-home'></i></a>
-      <a title='Viewer' href='viewer.html'><i class='fa fa-eye'></i></a>
-      <a title='Creator' href='creator.html'><i class='fa fa-wrench'></i></a>
-      <a title='About' href='about.html'><i class='fa fa-question'></i></a>
-    </div>
-    <div class='sidenav right'>
+    <div id='mainMenu'>
+      <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
+        <ul class='big-link-list'>
+          <li>
+            <a title='Home' class='big-link' href='index.html'>Home</a>
+          </li>
+          <li>
+            <a title='Viewer' class='big-link' href='viewer.html'>Viewer</a>
+          </li>
+          <li>
+            <a title='Creator' class='big-link' href='creator.html'>Creator</a>
+          </li>
+          <li>
+            <a title='About' class='big-link' href='about.html'>About</a>
+          </li>
+        </ul>
+      </div>
     </div>
     <div id='center-div' class='center'>
       <h1>

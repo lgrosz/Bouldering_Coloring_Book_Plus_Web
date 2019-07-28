@@ -1,0 +1,65 @@
+/***********************************************************************
+ * MENU CLASSES
+ **********************************************************************/
+/*
+ * To use:
+ *
+ * class list must contain `menu-content` and `<dir>-menu-content`
+ * div must have attribute `icon` with a unicode FontAwesome char
+ *
+ */
+
+.menu-content {
+  position: fixed;
+  width: 300px;
+  height: 90vh;
+  /* vertically center it */
+  top: 50%;
+  transform: translateY(-50%);
+  transition: 0.3s;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.menu-content:hover {
+  z-index: 1;
+}
+
+.menu-content:before {
+  position: absolute;
+  width: 25px;
+  padding: 20px;
+  color: black;
+  border-radius: 0 10px 10px 0;
+  font-family: 'FontAwesome';
+  font-size: 20pt;
+  content: attr(icon);
+}
+
+.left-menu-content {
+  left: -295px;
+  border-radius: 0 10px 10px 0;
+}
+
+.left-menu-content:before {
+  right: -65px;
+  border-radius: 0 10px 10px 0;
+}
+
+.left-menu-content:hover {
+  left: 0px;
+}
+
+.right-menu-content {
+  right: -295px;
+  border-radius: 10px 0 0 10px;
+}
+
+.right-menu-content:before {
+  left: -65px;
+  border-radius: 10px 0 0 10px;
+}
+
+.right-menu-content:hover {
+  right: 0px;
+}

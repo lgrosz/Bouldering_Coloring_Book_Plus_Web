@@ -1,0 +1,68 @@
+/***********************************************************************
+ * MAIN MENU
+ **********************************************************************/
+/* Style the links inside the sidenav */
+#mainMenu #navMenu {
+  background-color: rgba(76, 175, 80,0.9);
+}
+
+#mainMenu #navMenu:before {
+  top: 20px;
+  background-color: rgba(76, 175, 80,0.9);
+}
+
+#mainMenu #navMenu:active {
+  background-color: green;
+}
+
+
+/***********************************************************************
+ * HOLD MENU
+ **********************************************************************/
+/* Style the links inside the sidenav */
+#editMenu #holdMenu {
+  background-color: rgba(76, 175, 80,0.9);
+}
+
+#editMenu #holdMenu:before {
+  top: 20px;
+  background-color: rgba(76, 175, 80,0.9);
+}
+
+#editMenu #holdMenu:active {
+  background-color: green;
+}
+
+/***********************************************************************
+ * META MENU
+ **********************************************************************/
+/* Style the links inside the sidenav */
+#editMenu #metaMenu {
+  background-color: rgba(33, 150, 243, 0.9);
+}
+
+#editMenu #metaMenu:before {
+  top: 100px;
+  background-color: rgba(33, 150, 243, 0.9);
+}
+
+#editMenu #metaMenu:active {
+  background-color: blue;
+}
+
+/***********************************************************************
+ * SAVE MENU
+ **********************************************************************/
+/* Style the links inside the sidenav */
+#editMenu #saveMenu {
+  background-color: rgba(244, 67, 54, 0.9);
+}
+
+#editMenu #saveMenu:before {
+  top: 180px;
+  background-color: rgba(244, 67, 54, 0.9);
+}
+
+#editMenu #saveMenu:active {
+  background-color: red;
+}
