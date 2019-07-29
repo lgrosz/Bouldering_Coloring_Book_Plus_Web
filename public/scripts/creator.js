@@ -462,7 +462,7 @@ async function saveRoute() {
   if (docSnapshot.exists) {
     if (confirm('Are you sure you want to overwrite current route version?')) {
       db.collection('routes').doc(routeRef.id).set(route);
-      console.log('Successfully overwrote route.');
+      alert('Successfully overwrote route.');
     }
     else {
       saveRouteAs();
@@ -488,10 +488,12 @@ async function saveRouteAs() {
     let routeRef = await db.collection('routes').add(route);
     myState.routeId = routeRef.id;
     myState.keyAccepted = true;
-    console.log('Successfully saved route.');
+    alert('Successfully saved route.');
+    let notification = 'Modifying route with id ' + myState.routeId
+    document.getElementById('save-notification').innerHTML = notification;
   }
   catch {
-    console.log('Could not save route.');
+    alert('Could not save route.');
   }
 }
 
@@ -570,7 +572,7 @@ function updateSaveNotification() {
   let notification = 'Editing a new route';
   if (myState.routeId != null) {
     if (myState.keyAccepted) {
-      notification = 'Overwriting route with id ' + myState.routeId
+      notification = 'Modifying route with id ' + myState.routeId
     }
   }
   div.innerHTML = notification;
@@ -631,7 +633,7 @@ function addMetaDataEventListeners() {
     myState.route.name = nameInput.value;
   }
   let setterInput = document.getElementById('meta-setter');
-  setterInput.oniput = function () {
+  setterInput.oninput = function () {
     myState.route.setter = setterInput.value;
   }
   let descInput = document.getElementById('meta-desc');
