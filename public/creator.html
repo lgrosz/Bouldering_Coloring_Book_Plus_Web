@@ -7,6 +7,7 @@
     <link rel='stylesheet' href='styles/SlidingMenus.css'>
     <link rel='stylesheet' href='styles/FancyInputs.css'>
     <link rel='stylesheet' href='styles/Accordion.css'>
+    <link rel='stylesheet' href='styles/TagInput.css'>
     <link rel='stylesheet' href='styles/creator/Creator.css'>
     <!--<link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>--!>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"/>
@@ -60,10 +61,9 @@
           <button class='fancy' onclick='increaseGrade()'>+</button>
         </div>
         <textarea id='meta-desc' class='fancy' placeholder='Route Description'></textarea>
-        <div id='tag-div'>
-          <div id='tag-set'></div>
-          <input id='tag-input' type='text' placeholder='Tab to add a tag'></input>
-        </div>
+        <!-- These could be in the same div to be combined, but it looks better not like that. --!>
+        <input id='tag-input' class='tag-input' placeholder='Add a tag with `,`' type='text'></input>
+        <div id='tag-set' class='tag-set'></div>
       </div>
       <div id='holdMenu' class='menu-content right-menu-content' icon='&#xf1de'>
         <button class="accordion">Position</button>

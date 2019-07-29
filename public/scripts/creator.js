@@ -27,7 +27,9 @@ async function onload() {
   addMetaDataEventListeners();
   updateSaveNotification();
   populateHoldBrowser();
-  fixupMetaData();
+  if (myState.keyAccepted) {
+    fixupMetaData();
+  }
 }
 
 async function isMatchingKey(id, key) {
@@ -666,7 +668,7 @@ function setupTagInput() {
   
   tagInput.addEventListener('keydown' , e => {
     let tagInput = document.getElementById('tag-input');
-    if(e.keyCode == TABKEY) {
+    if(e.keyCode == 188) {
       let tagString = tagInput.value.trim().toLowerCase();
       if(e.preventDefault) {
         e.preventDefault();
