@@ -81,27 +81,6 @@ html, body {
   display: none;
 }
 
-.submenu {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 0; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  right: var(--nav-width-x2); /* Stay on the right */
-  background-color: lightgray;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 20px;
-  padding-right: 0;
-}
-
-.right0 {
-  right: var(--nav-width);
-}
-
-.right1 {
-  right: var(--nav-width-x2);
-}
-
 .open {
   width: var(--submenu-width);
   border-right: solid darkgray 1px;
@@ -119,17 +98,6 @@ html, body {
   text-align: center;
 }
 
-.preview {
-  vertical-align: middle;
-  margin: 0 auto;
-}
-
-.helper {
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-}
-
 /***********************/
 /* Style the tab */
 .tab {
@@ -145,7 +113,6 @@ html, body {
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
   transition: 0.3s;
 }
 
@@ -162,26 +129,8 @@ html, body {
 /* Style the tab content */
 .tabcontent {
   display: none;
-  padding: 6px 12px;
   border: 1px solid #ccc;
   border-top: none;
-}
-
-.taglist {
-  list-style-type: none;
-}
-
-.taglist li {
-  cursor: pointer;
-  border-radius: 10px;
-  background-color: #aaa;
-  padding: 8px;
-  margin: 4px;
-  text-decoration: none;
-  font-size: 12px;
-  color: black;
-  display: inline-block;
-  position: relative;
 }
 
 .big-link-list {

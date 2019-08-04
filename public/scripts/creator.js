@@ -11,7 +11,7 @@ async function onload() {
   // deal with url parameters
   let params = getUrlParams();
   if (params['id'] != undefined) {
-    // sets route id TODO, should not do this internally - should return route id
+    // sets route id, TODO: should not do this in loadRoute - should return route id instead
     await loadRoute(params['id']);
     myState.valid = false;
     if (params['key'] != undefined) {
@@ -90,13 +90,13 @@ function addCssEventListeners() {
   let accordions = document.getElementsByClassName('accordion');
 
   for (acc of accordions) {
-    acc.addEventListener("click", function() {
-      this.classList.toggle("active");
+    acc.addEventListener('click', function() {
+      this.classList.toggle('active');
       let panel = this.nextElementSibling;
-      if (panel.style.maxHeight){
-        panel.style.maxHeight = null;
+      if (panel.style.height){
+        panel.style.height = null;
       } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
+        panel.style.height = panel.scrollHeight + 'px';
       } 
     });
   }
@@ -430,23 +430,6 @@ function fixupEditMenu(selection) {
   document.getElementById('ehsm-sx').value = parseFloat(selection.sx);
   document.getElementById('ehsm-sy').value = parseFloat(selection.sy);
   document.getElementById('ehsm-color').value = selection.c;
-  document.getElementById('ehsm-path').value = selection.model;
-  updateHoldPreview();
-}
-
-function svRue() {
-  console.log('Saving route...');
-  let route = myState.route;
-  // should do check here
-
-  const db = firebase.firestore();
-  db.collection('routes').add(route)
-    .then(() => {
-      console.log('Document successfully written!');
-    })
-    .catch(() => {
-      console.log('Error writing document.')
-    });
 }
 
 async function saveRoute() {
@@ -497,20 +480,8 @@ async function saveRouteAs() {
   }
 }
 
-function updateHoldPreview() {
-  let previewImagePath = document.getElementById('ehsm-path').value;
-  let previewImageEl = assets[previewImagePath].cloneNode(true);
-  previewImageEl.classList.add('preview');
-  let previewImageDiv = document.getElementById('hold-preview');
-  let lastPreviewImageEl = previewImageDiv.lastElementChild;
-  if (lastPreviewImageEl != null) {
-    previewImageDiv.removeChild(lastPreviewImageEl);
-  }
-  previewImageDiv.appendChild(previewImageEl);
-}
-
 //////////////
-function openHoldType(evt, holdType) {
+function openTabHoldType(evt, holdType) {
   // Declare all variables
   let i, tabcontent, tablinks;
 
@@ -538,13 +509,8 @@ function populateHoldBrowser() {
   //maybe not using assets for this and have a hold
   //collection in firebase in addition to the assets
   const entries = Object.entries(assets);
-  editMenuModelSelect = document.getElementById('ehsm-path');
   for (const [path, img] of entries) {
     if (path.includes('holds')) {
-      //add the option to the select element
-      let option = document.createElement('option');
-      option.text = path;
-      editMenuModelSelect.add(option);
       //get typestring
       let idx1 = path.indexOf('/') + 1;
       let idx2 = path.lastIndexOf('/');
@@ -556,9 +522,6 @@ function populateHoldBrowser() {
         //on click the selection option should change and
         //the previous should be updated
         imgchild.addEventListener('click', function(){ 
-          let selectionEl = editMenuModelSelect;
-          selectionEl.value = path;
-          updateHoldPreview();
           myState.selection.model = path;
           myState.valid = false;
         });
@@ -620,11 +583,8 @@ function addEditHoldEventListeners() {
     myState.selection.sy = parseFloat(syInput.value);
     myState.valid = false;
   }
-  let pathInput = document.getElementById('ehsm-path');
-  pathInput.onchange = function () {
-    myState.selection.model = pathInput.value;
-    myState.valid = false;
-  }
+  //TODO: add box around current model - or draw a
+  //preview of currently selected model
 }
 
 function addMetaDataEventListeners() {

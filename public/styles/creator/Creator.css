@@ -2,16 +2,16 @@
  * MAIN MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#mainMenu #navMenu {
-  background-color: rgba(76, 175, 80,0.9);
+#navMenu {
+  background-color: rgba(76, 175, 80,0.95);
 }
 
-#mainMenu #navMenu:before {
+#navMenu:before {
   top: 20px;
-  background-color: rgba(76, 175, 80,0.9);
+  background-color: rgba(76, 175, 80,0.95);
 }
 
-#mainMenu #navMenu:active {
+#navMenu:active {
   background-color: green;
 }
 
@@ -20,16 +20,16 @@
  * HOLD MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#editMenu #holdMenu {
-  background-color: rgba(76, 175, 80,0.9);
+#holdMenu {
+  background-color: rgba(76, 175, 80,0.95);
 }
 
-#editMenu #holdMenu:before {
+#holdMenu:before {
   top: 20px;
-  background-color: rgba(76, 175, 80,0.9);
+  background-color: rgba(76, 175, 80,0.95);
 }
 
-#editMenu #holdMenu:active {
+#holdMenu:active {
   background-color: green;
 }
 
@@ -37,16 +37,16 @@
  * META MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#editMenu #metaMenu {
-  background-color: rgba(33, 150, 243, 0.9);
+#metaMenu {
+  background-color: rgba(33, 150, 243, 0.95);
 }
 
-#editMenu #metaMenu:before {
+#metaMenu:before {
   top: 100px;
-  background-color: rgba(33, 150, 243, 0.9);
+  background-color: rgba(33, 150, 243, 0.95);
 }
 
-#editMenu #metaMenu:active {
+#metaMenu:active {
   background-color: blue;
 }
 
@@ -54,15 +54,15 @@
  * SAVE MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#editMenu #saveMenu {
-  background-color: rgba(244, 67, 54, 0.9);
+#saveMenu {
+  background-color: rgba(244, 67, 54, 0.95);
 }
 
-#editMenu #saveMenu:before {
+#saveMenu:before {
   top: 180px;
-  background-color: rgba(244, 67, 54, 0.9);
+  background-color: rgba(244, 67, 54, 0.95);
 }
 
-#editMenu #saveMenu:active {
+#saveMenu:active {
   background-color: red;
 }

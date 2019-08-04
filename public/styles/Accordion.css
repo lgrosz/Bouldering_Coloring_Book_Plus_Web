@@ -6,7 +6,8 @@
   padding: 18px;
   width: 100%;
   text-align: left;
-  border: none;
+  font-size: 16px;
+  border: none
   outline: none;
   transition: 0.3s;
 }
@@ -30,10 +31,13 @@
 
 /* Style the accordion panel. Note: hidden by default */
 .accordion-panel {
-  box-sizing: border-box;
-  padding: 0 18px;
   background-color: white;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
+  height: 0;
+  max-height: 500px;
+  overflow: auto;
+  transition: height 0.2s ease-out;
+}
+
+.accordion-panel div {
+  margin: 18px;
 }
