@@ -126,16 +126,33 @@ function populateRouteBrowser() {
         routeData = doc.data();
         nameString = routeData.name;
         setterString = routeData.setter;
+        gradeString = 'V' + routeData.grade;
 
         //setup button
-        var button = document.createElement('button');
-        button.classList.add('browser-button');
-        button.innerHTML = nameString
-                           + ' | V' + routeData.grade
-                           + '<br />' + setterString;
+        let button = document.createElement('table');
+        button.classList.add('route-button');
+        let buttonRow1 = document.createElement('tr');
+        let buttonRow2 = document.createElement('tr');
+        let buttonName = document.createElement('td');
+        buttonName.classList.add('route-button-name');
+        buttonName.innerHTML = nameString;
+        let buttonSetter = document.createElement('td');
+        buttonSetter.classList.add('route-button-setter');
+        buttonSetter.innerHTML = setterString;
+        let buttonGrade = document.createElement('td');
+        buttonGrade.setAttribute('rowspan', '2');
+        buttonGrade.classList.add('route-button-grade');
+        buttonGrade.innerHTML = gradeString;
+        buttonRow1.appendChild(buttonGrade);
+        buttonRow1.appendChild(buttonName);
+        buttonRow2.appendChild(buttonSetter);
+        button.appendChild(buttonRow1);
+        button.appendChild(buttonRow2);
+
         button.onclick = function () {
           loadRoute(doc.id);
         }
+
         routeButtonGroup.appendChild(button);
       });
     })

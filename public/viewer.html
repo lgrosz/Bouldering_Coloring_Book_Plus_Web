@@ -28,39 +28,35 @@
       <h2 id='routesetter'></h2>
       <p id='routedesc'></p>
     </div>
-    <div id='mainMenu'>
-      <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
-        <ul class='big-link-list'>
-          <li>
-            <a title='Home' class='big-link' href='index.html'>Home</a>
-          </li>
-          <li>
-            <a title='Viewer' class='big-link' href='viewer.html'>Viewer</a>
-          </li>
-          <li>
-            <a title='Creator' class='big-link' href='creator.html'>Creator</a>
-          </li>
-          <li>
-            <a title='About' class='big-link' href='about.html'>About</a>
-          </li>
-        </ul>
+    <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
+      <ul class='big-link-list'>
+        <li>
+          <a title='Home' class='big-link' href='index.html'>Home</a>
+        </li>
+        <li>
+          <a title='Viewer' class='big-link' href='viewer.html'>Viewer</a>
+        </li>
+        <li>
+          <a title='Creator' class='big-link' href='creator.html'>Creator</a>
+        </li>
+        <li>
+          <a title='About' class='big-link' href='about.html'>About</a>
+        </li>
+      </ul>
+    </div>
+    <div id='routeMenu' class='menu-content right-menu-content' icon='&#xf03a'>
+      <input type='text' placeholder='Search...'>
+      <a href='javascript:void(0)' onclick='filterRoutes()'>
+        <i class='fa fa-filter'></i>
+      </a>
+      <div id='route-button-group'>
+        <!-- Route buttons go here!--!>
       </div>
     </div>
-    <div id='editMenu'>
-      <div id='routeMenu' class='menu-content right-menu-content' icon='&#xf03a'>
-        <input type='text' placeholder='Search...'>
-        <a href='javascript:void(0)' onclick='filterRoutes()'>
-          <i class='fa fa-filter'></i>
-        </a>
-        <div id='route-button-group'>
-          <!-- Route buttons go here!--!>
-        </div>
-      </div>
-      <div id='editRouteMenu' class='menu-content right-menu-content' icon='&#xf044'>
-        <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
-          <i class='fa fa-pencil'></i>
-        </a>
-      </div>
+    <div id='editRouteMenu' class='menu-content right-menu-content' icon='&#xf044'>
+      <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
+        <i class='fa fa-pencil'></i>
+      </a>
     </div>
   </body>
 </html>

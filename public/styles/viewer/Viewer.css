@@ -2,16 +2,16 @@
  * MAIN MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#mainMenu #navMenu {
+#navMenu {
   background-color: rgba(76, 175, 80,0.9);
 }
 
-#mainMenu #navMenu:before {
+#navMenu:before {
   top: 20px;
   background-color: rgba(76, 175, 80,0.9);
 }
 
-#mainMenu #navMenu:active {
+#navMenu:active {
   background-color: green;
 }
 
@@ -20,16 +20,16 @@
  * ROUTE MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#editMenu #routeMenu {
+#routeMenu {
   background-color: rgba(76, 175, 80,0.9);
 }
 
-#editMenu #routeMenu:before {
+#routeMenu:before {
   top: 20px;
   background-color: rgba(76, 175, 80,0.9);
 }
 
-#editMenu #routeMenu:active {
+#routeMenu:active {
   background-color: green;
 }
 
@@ -37,15 +37,50 @@
  * EDITROUTE MENU
  **********************************************************************/
 /* Style the links inside the sidenav */
-#editMenu #editRouteMenu {
+#editRouteMenu {
   background-color: rgba(33, 150, 243, 0.9);
 }
 
-#editMenu #editRouteMenu:before {
+#editRouteMenu:before {
   top: 100px;
   background-color: rgba(33, 150, 243, 0.9);
 }
 
-#editMenu #editRouteMenu:active {
+#editRouteMenu:active {
   background-color: blue;
+}
+
+/***********************************************************************
+ * HOLD BUTTON
+ **********************************************************************/
+.route-button {
+  margin: 10px 0 10px 0;
+  display: block;
+  background: #ddd;
+  border: 2px solid black;
+}
+
+.route-button:hover {
+  cursor: pointer;
+}
+
+.route-button:active {
+  background: #aaa;
+  color: white;
+}
+
+.route-button-grade {
+  font-size: 36px;
+  padding: 5px;
+  border-right: 2px solid black;
+}
+
+.route-button-name {
+  padding: 5px 0 2px 5px;
+  font-size: 18px;
+}
+
+.route-button-setter {
+  font-size: 14px;
+  padding: 2px 0 5px 5px;
 }
