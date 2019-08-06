@@ -25,6 +25,22 @@ async function loadAssets() {
   return imagePathToElMap;
 }
 
+async function loadTags() {
+  let tagList = [];
+  // get all tags from firestore
+  const db = firebase.firestore();
+  await db.collection('tags')
+    .get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        let tagData = doc.data();
+        let tagString = tagData.tagString;
+        tagList.push(tagString);
+      });
+    });
+  return tagList;
+}
+
 // toggle or force off a menu
 function toggleMenu(menuId, forceOff=false) {
   let menuDiv = document.getElementById(menuId);

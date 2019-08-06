@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', onload)
 
 async function onload() {
   // initialize canvas state, globals
+  // TODO these shouldn't be in-line
   assets = await loadAssets();
+  tags = await loadTags();
+  setupTagChecklist();
   myState = new CreatorState(document.getElementById('route-canvas'));
-
-  //pre load
-  setupTagInput();
 
   // deal with url parameters
   let params = getUrlParams();
@@ -548,7 +548,8 @@ function fixupMetaData() {
   document.getElementById('meta-setter').value = route.setter;
   document.getElementById('meta-desc').value = route.description;
   for (tagString of route.tags) {
-    addTag(tagString);
+    let checkbox = document.getElementById('tag-' + tagString);
+    checkbox.checked = true;
   }
 }
 
@@ -620,48 +621,43 @@ function decreaseGrade() {
   gradeDisplay.innerHTML = grade;
 }
 
-/***********************************************************************
- * TAGS
- **********************************************************************/
-function setupTagInput() {
-  let tagInput = document.getElementById('tag-input');
-  let tagSet = document.getElementById('tag-set');
-  let TABKEY = 9;
-  
-  tagInput.addEventListener('keydown' , e => {
-    let tagInput = document.getElementById('tag-input');
-    if(e.keyCode == 188) {
-      let tagString = tagInput.value.trim().toLowerCase();
-      if(e.preventDefault) {
-        e.preventDefault();
-        if (tagString == '') {
-          return false;
+function setupTagChecklist() {
+  let checklistDiv = document.getElementById('tag-checkbox-div');
+  for (tagString of tags) {
+    // setup span to contain the input and label
+    let spanContainer = document.createElement('span');
+    spanContainer.style.display = 'block'
+    // setup input element
+    let checkbox = document.createElement('input');
+    checkbox.id = 'tag-' + tagString;
+    checkbox.type = 'checkbox';
+    checkbox.value = tagString;
+    // label for that input element
+    let checkboxLabel = document.createElement('label');
+    checkboxLabel.for = 'tag-' + tagString;
+    checkboxLabel.style.whiteSpace = 'nowrap';
+    checkboxLabel.innerHTML = tagString;
+    spanContainer.appendChild(checkbox);
+    spanContainer.appendChild(checkboxLabel);
+    checklistDiv.appendChild(spanContainer);
+    // update route data when that input box changes
+    checkbox.onchange = function () {
+      let routeTags = myState.route.tags
+      let currentTag = this.value;
+      let currentTagIndex = routeTags.indexOf(currentTag);
+      if (this.checked) {
+        // add tag if it isn't there already (just in case)
+        if (currentTagIndex === -1) {
+          routeTags.push(currentTag);
         }
-        if (myState.route.tags.indexOf(tagString) != -1) {
-          return false;
-        }
-        addTag(tagString);
-        myState.route.tags.push(tagString);
-        tagInput.value = '';
       }
-      return false;
+      else {
+        // remove all instances (just in case) of tag
+        while (currentTagIndex !== -1) {
+          routeTags.splice(currentTagIndex, 1);
+          currentTagIndex = routeTags.indexOf(currentTag);
+        }
+      }
     }
-  });
-}
-
-function addTag(tagString) {
-  let tag = document.createElement('div');
-  let aTag = document.createElement('a');
-  let spanTag = document.createElement('span');
-  tag.classList.add('tag');
-  aTag.innerHTML = '<i class="fa fa-times"></i>';
-  spanTag.innerHTML = tagString;
-  //remove tag
-  aTag.addEventListener('click', function() {
-    this.parentElement.parentElement.removeChild(this.parentElement);
-    myState.route.tags.splice(myState.route.tags.indexOf(tagString),1);
-  });
-  tag.appendChild(aTag);
-  tag.appendChild(spanTag);
-  document.getElementById('tag-set').appendChild(tag);
+  }
 }

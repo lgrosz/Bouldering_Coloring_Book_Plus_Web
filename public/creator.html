@@ -60,21 +60,16 @@
         <div>
           <textarea id='meta-desc' placeholder='Route Description'></textarea>
         </div>
+        <div>
+          <button onclick='decreaseGrade()'>-</button>
+          V<span id='route-grade-display'>0</span>
+          <button onclick='increaseGrade()'>+</button>
+        </div>
       </div>
-      <button class='accordion'>Meta Data</button>
+      <button class='accordion'>Tags</button>
       <div class='accordion-panel'>
-        <div>
-          <div>
-            <button onclick='decreaseGrade()'>-</button>
-            V<span id='route-grade-display'>0</span>
-            <button onclick='increaseGrade()'>+</button>
-          </div>
-        </div>
-        <div>
-          <input id='tag-input' class='tag-input' placeholder='Add a tag with `,`' type='text'></input>
-        </div>
-        <div>
-          <div id='tag-set' class='tag-set'></div>
+        <!-- Tag Checkboxes go in here --!>
+        <div id='tag-checkbox-div'>
         </div>
       </div>
     </div>
