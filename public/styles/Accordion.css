@@ -21,11 +21,11 @@
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active, .accordion:hover {
+.accordion .active, .accordion:hover {
   background-color: #ccc;
 }
 
-.active:after {
+.accordion .active:after {
   content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
 
@@ -33,7 +33,7 @@
 .accordion-panel {
   background-color: white;
   height: 0;
-  max-height: 500px;
+  max-height: 400px;
   overflow: auto;
   transition: height 0.2s ease-out;
 }
