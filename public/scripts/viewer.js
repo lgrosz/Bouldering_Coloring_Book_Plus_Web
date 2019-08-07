@@ -11,7 +11,8 @@ async function onload() {
     loadRoute(params['id']);
   }
 
-  populateRouteBrowser();
+  let defaultFilter = [];
+  populateRouteBrowser(defaultFilter);
 }
 
 // load route from routeid
@@ -112,48 +113,27 @@ ViewerState.prototype.drawHold = function(holdData) {
   ctx.restore();
 }
 
-/////////////////////////////////////
-function populateRouteBrowser() {
-
+function populateRouteBrowser(filter=[], minGrade=0, maxGrade=16) {
   let routeButtonGroup = document.getElementById('route-button-group');
 
   const db = firebase.firestore();
+  let query = db.collection('routes');
 
-  db.collection('routes')
-    .get()
-    .then(function(querySnapshot) {
-      querySnapshot.forEach(function(doc) {
+  console.log({filter, minGrade, maxGrade});
+  for (tag of filter) {
+    query = query.where('tags', 'array-contains', tag);
+  }
+  query = query.where('grade', '>=', minGrade);
+  query = query.where('grade', '<=', maxGrade);
+  query.get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(doc => {
         routeData = doc.data();
-        nameString = routeData.name;
-        setterString = routeData.setter;
-        gradeString = 'V' + routeData.grade;
-
-        //setup button
-        let button = document.createElement('table');
-        button.classList.add('route-button');
-        let buttonRow1 = document.createElement('tr');
-        let buttonRow2 = document.createElement('tr');
-        let buttonName = document.createElement('td');
-        buttonName.classList.add('route-button-name');
-        buttonName.innerHTML = nameString;
-        let buttonSetter = document.createElement('td');
-        buttonSetter.classList.add('route-button-setter');
-        buttonSetter.innerHTML = setterString;
-        let buttonGrade = document.createElement('td');
-        buttonGrade.setAttribute('rowspan', '2');
-        buttonGrade.classList.add('route-button-grade');
-        buttonGrade.innerHTML = gradeString;
-        buttonRow1.appendChild(buttonGrade);
-        buttonRow1.appendChild(buttonName);
-        buttonRow2.appendChild(buttonSetter);
-        button.appendChild(buttonRow1);
-        button.appendChild(buttonRow2);
-
-        button.onclick = function () {
+        routeButton = getRouteButton(routeData);
+        routeButton.onclick = function () {
           loadRoute(doc.id);
         }
-
-        routeButtonGroup.appendChild(button);
+        routeButtonGroup.appendChild(routeButton);
       });
     })
     .catch(function(error) {
@@ -169,4 +149,32 @@ function editCurrentRoute() {
     let parameters = '?id=' + myState.routeId + '&key=' + key;
     window.location.href = 'creator.html' + parameters;
   }
+}
+
+function getRouteButton(routeData) {
+  nameString = routeData.name;
+  setterString = routeData.setter;
+  gradeString = 'V' + routeData.grade;
+
+  //setup button
+  let button = document.createElement('table');
+  button.classList.add('route-button');
+  let buttonRow1 = document.createElement('tr');
+  let buttonRow2 = document.createElement('tr');
+  let buttonName = document.createElement('td');
+  buttonName.classList.add('route-button-name');
+  buttonName.innerHTML = nameString;
+  let buttonSetter = document.createElement('td');
+  buttonSetter.classList.add('route-button-setter');
+  buttonSetter.innerHTML = setterString;
+  let buttonGrade = document.createElement('td');
+  buttonGrade.setAttribute('rowspan', '2');
+  buttonGrade.classList.add('route-button-grade');
+  buttonGrade.innerHTML = gradeString;
+  buttonRow1.appendChild(buttonGrade);
+  buttonRow1.appendChild(buttonName);
+  buttonRow2.appendChild(buttonSetter);
+  button.appendChild(buttonRow1);
+  button.appendChild(buttonRow2);
+  return button;
 }
