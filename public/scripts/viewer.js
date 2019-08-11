@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', onload)
 
 async function onload() {
   //initialize canvas state, globals
+  tags = await loadTags();
+  setupTagChecklist();
+
   assets = await loadAssets();
   myState = new ViewerState(document.getElementById('route-canvas'));
 
@@ -11,8 +14,8 @@ async function onload() {
     loadRoute(params['id']);
   }
 
-  let defaultFilter = [];
-  populateRouteBrowser(defaultFilter);
+  populateRouteBrowser();
+  addCssEventListeners();
 }
 
 // load route from routeid
@@ -40,7 +43,6 @@ async function loadRoute(id) {
 }
 
 function ViewerState(canvas) {
-  // setup canvas dimensions
   this.div = document.getElementById('wall-div');
   this.canvas = canvas;
 
@@ -58,18 +60,20 @@ function ViewerState(canvas) {
 }
 
 ViewerState.prototype.clear = function() {
-  this.ctx.clearRect(0, 0, this.width, this.height);
+  let canvas = this.canvas;
+  this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 ViewerState.prototype.drawBackground = function() {
+  let canvas = this.canvas;
   let ctx = this.ctx;
+  let containerHeight = this.div.clientHeight;
 
-  this.canvas.height = this.div.clientHeight;
-  this.height = this.canvas.clientHeight;
-  this.scale = this.height / this.backgroundImage.height;
-  this.width = this.scale * this.backgroundImage.width;
-  this.canvas.width = this.width;
-  ctx.drawImage(this.backgroundImage, 0, 0, this.width, this.height);
+  canvas.height = containerHeight;
+  this.scale = canvas.height / this.backgroundImage.height;
+  canvas.width = this.scale * this.backgroundImage.width;
+
+  ctx.drawImage(this.backgroundImage, 0, 0, canvas.width, canvas.height);
 }
 
 ViewerState.prototype.resetWall = function() {
@@ -127,6 +131,10 @@ function populateRouteBrowser(filter=[], minGrade=0, maxGrade=16) {
   query = query.where('grade', '<=', maxGrade);
   query.get()
     .then(querySnapshot => {
+      //remove all route buttons before populating it again
+      while (routeButtonGroup.firstChild) {
+        routeButtonGroup.removeChild(routeButtonGroup.firstChild);
+      }
       querySnapshot.forEach(doc => {
         routeData = doc.data();
         routeButton = getRouteButton(routeData);
@@ -177,4 +185,63 @@ function getRouteButton(routeData) {
   button.appendChild(buttonRow1);
   button.appendChild(buttonRow2);
   return button;
+}
+
+function setupTagChecklist() {
+  let checklistDiv = document.getElementById('tag-checkbox-div');
+  for (tagString of tags) {
+    // setup span to contain the input and label
+    let spanContainer = document.createElement('span');
+    spanContainer.style.display = 'block'
+    // setup input element
+    let checkbox = document.createElement('input');
+    checkbox.id = 'tag-' + tagString;
+    checkbox.type = 'checkbox';
+    checkbox.value = tagString;
+    // label for that input element
+    let checkboxLabel = document.createElement('label');
+    checkboxLabel.for = 'tag-' + tagString;
+    checkboxLabel.style.whiteSpace = 'nowrap';
+    checkboxLabel.innerHTML = tagString;
+    spanContainer.appendChild(checkbox);
+    spanContainer.appendChild(checkboxLabel);
+    checklistDiv.appendChild(spanContainer);
+    // update route data when that input box changes
+    checkbox.onchange = function () {
+      let filter = getFilter();
+      populateRouteBrowser(filter);
+    }
+  }
+}
+
+function getFilter() {
+  let filter = [];
+  let checklistDiv = document.getElementById('tag-checkbox-div');
+  let spanArray = Array.from(checklistDiv.children);
+  for (span of spanArray) {
+    if (span.firstChild.checked) {
+      filter.push(span.firstChild.value)
+    }
+  }
+  //issue 1: array contains query requires index
+  //issue 2: cannot chain array-contains queries
+  //return filter;
+}
+
+//FROM CREATOR PAGE
+function addCssEventListeners() {
+  // ACCORDIONS
+  let accordions = document.getElementsByClassName('accordion');
+
+  for (acc of accordions) {
+    acc.addEventListener('click', function() {
+      this.classList.toggle('active');
+      let panel = this.nextElementSibling;
+      if (panel.style.height){
+        panel.style.height = null;
+      } else {
+        panel.style.height = panel.scrollHeight + 'px';
+      } 
+    });
+  }
 }

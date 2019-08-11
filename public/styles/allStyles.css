@@ -7,7 +7,6 @@
 }
 
 html, body {
-  font-family: Roboto;
   height: 100vh;
   width: 100vw;
 }
@@ -29,7 +28,7 @@ html, body {
   height: 100%;
   /* These are the dimensions of the wall image*/
   max-height: 1069px;
-  max-width: calc(100% - 140px);
+  /*max-width: calc(100% - 140px);*/
   overflow: auto;
 }
 

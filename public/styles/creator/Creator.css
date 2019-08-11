@@ -11,10 +11,6 @@
   background-color: rgba(76, 175, 80,0.95);
 }
 
-#navMenu:active {
-  background-color: green;
-}
-
 
 /***********************************************************************
  * HOLD MENU
@@ -27,10 +23,6 @@
 #holdMenu:before {
   top: 20px;
   background-color: rgba(76, 175, 80,0.95);
-}
-
-#holdMenu:active {
-  background-color: green;
 }
 
 /***********************************************************************
@@ -46,10 +38,6 @@
   background-color: rgba(33, 150, 243, 0.95);
 }
 
-#metaMenu:active {
-  background-color: blue;
-}
-
 /***********************************************************************
  * SAVE MENU
  **********************************************************************/
@@ -61,8 +49,4 @@
 #saveMenu:before {
   top: 180px;
   background-color: rgba(244, 67, 54, 0.95);
-}
-
-#saveMenu:active {
-  background-color: red;
 }

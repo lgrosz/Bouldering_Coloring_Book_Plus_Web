@@ -44,36 +44,41 @@
       </ul>
     </div>
     <div id='saveMenu' class='menu-content right-menu-content' icon='&#xf0c7'>
-      <div id='save-notification'></div>
-      <button type='button' onclick='saveRoute()'>Save</button>
-      <button type='button' onclick='saveRouteAs()'>Save As</button>
+      <div class='container'>
+        <div id='save-notification'></div>
+        <button type='button' onclick='saveRoute()'>Save</button>
+        <button type='button' onclick='saveRouteAs()'>Save As</button>
+      </div>
     </div>
     <div id='metaMenu' class='menu-content right-menu-content' icon='&#xf15b'>
-      <button class='accordion'>Route Data</button>
-      <div class='accordion-panel'>
-        <div>
-          <input id='meta-name' type='text' placeholder='Name'></input>
+      <div class='container'>
+        <button class='accordion'>Route Data</button>
+        <div class='accordion-panel'>
+          <div>
+            <input id='meta-name' type='text' placeholder='Name'></input>
+          </div>
+          <div>
+            <input id='meta-setter' type='text' placeholder='Setter'>
+          </div>
+          <div>
+            <textarea id='meta-desc' placeholder='Route Description'></textarea>
+          </div>
+          <div>
+            <button onclick='decreaseGrade()'>-</button>
+            V<span id='route-grade-display'>0</span>
+            <button onclick='increaseGrade()'>+</button>
+          </div>
         </div>
-        <div>
-          <input id='meta-setter' type='text' placeholder='Setter'>
-        </div>
-        <div>
-          <textarea id='meta-desc' placeholder='Route Description'></textarea>
-        </div>
-        <div>
-          <button onclick='decreaseGrade()'>-</button>
-          V<span id='route-grade-display'>0</span>
-          <button onclick='increaseGrade()'>+</button>
-        </div>
-      </div>
-      <button class='accordion'>Tags</button>
-      <div class='accordion-panel'>
-        <!-- Tag Checkboxes go in here --!>
-        <div id='tag-checkbox-div'>
+        <button class='accordion'>Tags</button>
+        <div class='accordion-panel'>
+          <div id='tag-checkbox-div'>
+            <!-- Tag Checkboxes go in here --!>
+          </div>
         </div>
       </div>
     </div>
     <div id='holdMenu' class='menu-content right-menu-content' icon='&#xf1de'>
+      <div class='container'>
       <button class="accordion">Position</button>
       <div class='accordion-panel'>
         <div>
@@ -139,6 +144,7 @@
             <p id='jibslist'></p>
           </div>
         </div>
+      </div>
     </div>
   </body>
 </html>

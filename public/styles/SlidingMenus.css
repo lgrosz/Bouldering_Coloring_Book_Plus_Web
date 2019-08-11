@@ -21,6 +21,14 @@
   box-sizing: border-box;
 }
 
+.menu-content .container {
+  box-sizing: border-box;
+  padding-bottom: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height:100%;
+}
+
 .menu-content:hover {
   z-index: 1;
 }

@@ -5,6 +5,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <link rel='stylesheet' type='text/css' href='styles/allStyles.css'>
     <link rel="stylesheet" href='styles/SlidingMenus.css'>
+    <link rel="stylesheet" href='styles/Accordion.css'>
     <link rel="stylesheet" href='styles/viewer/Viewer.css'>
     <!--<link rel="stylesheet" href='line-awesome/css/line-awesome-font-awesome.min.css'>--!>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet"/>
@@ -19,14 +20,18 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src='/__/firebase/init.js'></script>
   </head>
-  <body>
+  <body id='app-container'>
     <script src='scripts/utilities.js'></script>
     <script src='scripts/viewer.js'></script>
-    <div id='wall-div'>
-      <canvas id='route-canvas'></canvas>
-      <h1 id='routetitle'></h1>
-      <h2 id='routesetter'></h2>
-      <p id='routedesc'></p>
+    <div>
+      <div id='wall-div'>
+        <canvas id='route-canvas'></canvas>
+      </div>
+      <div id='route-info'>
+        <h1 id='routetitle'>Select a route in the browser to view it.</h1>
+        <h2 id='routesetter'></h2>
+        <p id='routedesc'></p>
+      </div>
     </div>
     <div id='navMenu' class='menu-content left-menu-content' icon='&#xf0c9'>
       <ul class='big-link-list'>
@@ -44,19 +49,28 @@
         </li>
       </ul>
     </div>
-    <div id='routeMenu' class='menu-content right-menu-content' icon='&#xf03a'>
-      <input type='text' placeholder='Search...'>
-      <a href='javascript:void(0)' onclick='filterRoutes()'>
-        <i class='fa fa-filter'></i>
-      </a>
-      <div id='route-button-group'>
-        <!-- Route buttons go here!--!>
+    <div id='editRouteMenu' class='menu-content right-menu-content' icon='&#xf044'>
+      <div class='container'>
+        <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
+          <i class='fa fa-pencil'></i>
+        </a>
       </div>
     </div>
-    <div id='editRouteMenu' class='menu-content right-menu-content' icon='&#xf044'>
-      <a href='javascript:void(0)' class='opensubmenu' onclick='editCurrentRoute()'>
-        <i class='fa fa-pencil'></i>
-      </a>
+    <div id='routeMenu' class='menu-content right-menu-content' icon='&#xf03a'>
+      <div class='container'>
+        <button class='accordion'>Filters<br />(not yet implemented)</button>
+        <div class='accordion-panel'>
+          <div id='tag-checkbox-div'>
+            <!-- Tag Checkboxes go in here --!>
+          </div>
+        </div>
+        <button class='accordion'>Routes</button>
+        <div class='accordion-panel'>
+          <div id='route-button-group'>
+            <!-- Route buttons go here!--!>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
