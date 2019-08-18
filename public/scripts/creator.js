@@ -10,13 +10,16 @@ async function onload() {
 
   // deal with url parameters
   let params = getUrlParams();
-  if (params['id'] != undefined) {
-    // sets route id, TODO: should not do this in loadRoute - should return route id instead
-    await loadRoute(params['id']);
-    myState.valid = false;
-    if (params['key'] != undefined) {
-      let id = params['id'];
-      let key = params['key'];
+  let id = params['id'];
+  let key = params['key'];
+  if (id != undefined) {
+    let route = await loadRoute(id);
+    if (route != null) {
+      myState.routeId = id;
+      myState.route = route;
+      myState.valid = false;
+    }
+    if (key != undefined) {
       myState.keyAccepted = await isMatchingKey(id, key);
     }
   }
@@ -77,11 +80,10 @@ async function loadRoute(id) {
         console.log('Could not find route id:', id);
       }
     });
+  return route;
   if (route != null) {
     myState.routeId = id;
     myState.route = route;
-    myState.resetWall();
-    console.log('Successfully loaded route.');
   }
 }
 
