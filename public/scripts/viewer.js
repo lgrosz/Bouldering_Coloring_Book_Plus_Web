@@ -170,8 +170,11 @@ function getRouteButton(routeData) {
   let buttonRow1 = document.createElement('tr');
   let buttonRow2 = document.createElement('tr');
   let buttonName = document.createElement('td');
+  //let buttonNameSpan = document.createElement('span');
+  //buttonNameSpan.innerHTML = nameString;
   buttonName.classList.add('route-button-name');
   buttonName.innerHTML = nameString;
+  //buttonName.appendChild(buttonNameSpan);
   let buttonSetter = document.createElement('td');
   buttonSetter.classList.add('route-button-setter');
   buttonSetter.innerHTML = setterString;
@@ -225,7 +228,7 @@ function getFilter() {
   }
   //issue 1: array contains query requires index
   //issue 2: cannot chain array-contains queries
-  //return filter;
+  return filter;
 }
 
 //FROM CREATOR PAGE
